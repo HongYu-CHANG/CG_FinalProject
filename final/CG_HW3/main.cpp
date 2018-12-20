@@ -13,7 +13,7 @@
 
 
 //number of textures desired, you may want to change it to get bonus point
-#define TEXTURE_NUM 6
+#define TEXTURE_NUM 8
 //directories of image files
 char* texture_name[TEXTURE_NUM] = {
 	"../Resources/wallTexture.bmp", // 0
@@ -22,6 +22,8 @@ char* texture_name[TEXTURE_NUM] = {
 	"../Resources/pkiss.bmp", // 3
 	"../Resources/ppiano.bmp", // 4
 	"../Resources/pstar.bmp", // 5
+	"../Resources/wall9.bmp", // 6
+	"../Resources/wall12.bmp", // 7
 
 };
 //texture id array
@@ -163,7 +165,7 @@ int main(int argc, char *argv[])
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 	// remember to replace "YourStudentID" with your own student ID
-	glutCreateWindow("CG_HW3_0656611");
+	glutCreateWindow("CG_FinalProject");
 	glutReshapeWindow(512, 512);
 
 	glewInit();
@@ -230,9 +232,11 @@ void init(void)
 	Image* pkiss = loadTexture(texture_name[3]);//kiss
 	Image* ppiano = loadTexture(texture_name[4]);//piano
 	Image* pstar = loadTexture(texture_name[5]);//star
+	Image* upWallTex = loadTexture(texture_name[6]);//upWall
+	Image* downWallTex = loadTexture(texture_name[7]);//downWall
 	
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures(6, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
+	glGenTextures(8, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -275,6 +279,23 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pstar->sizeX, pstar->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pstar->data);
 
+	glBindTexture(GL_TEXTURE_2D, texture[6]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, upWallTex->sizeX, upWallTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, upWallTex->data);
+
+	glBindTexture(GL_TEXTURE_2D, texture[7]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, downWallTex->sizeX, downWallTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, downWallTex->data);
+
+	for (int i = 0; i < TEXTURE_NUM; i++) {
+		std::cout << texture[i] << std::endl;
+	}
 
 	//TA
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -405,12 +426,17 @@ void display(void)
 	glTranslatef(0.0f, 0.0f, 0.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-3.14f, -2.5f, 14.9f);
+		/*glTexCoord2f(0.0f, 0.0f); glVertex3f(-3.14f, -2.5f, 14.9f);
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-3.14f, 2.5f, 14.9f);
 		glTexCoord2f(1.0f, 0.0f); glVertex3f(3.14f, -2.5f, 14.9f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);*/
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.9f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.9f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.9f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.9f);
 	glEnd();
 
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glPopMatrix();
 	//glEnable(GL_CULL_FACE);
@@ -451,9 +477,10 @@ void skybox(float a, float b)
 	glTranslatef(0.0f, 0.0f, 0.0f);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	//glBindTexture(GL_TEXTURE_2D, texture[0]);
 
 	//up
+	glBindTexture(GL_TEXTURE_2D, texture[6]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(a, b, -a);
@@ -463,6 +490,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//down
+	glBindTexture(GL_TEXTURE_2D, texture[7]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(a, -b, a);
@@ -472,6 +500,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//far
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(a, b, a);
@@ -481,6 +510,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//left
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(a, b, -a);
@@ -490,6 +520,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//right
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-a, b, a);
@@ -499,6 +530,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//near
+	//glBindTexture(GL_TEXTURE_2D, texture[0]);
 	//glBegin(GL_TRIANGLE_STRIP);
 	//glColor3f(1, 1, 1);
 	//	glTexCoord2f(0.0f, 1.0f); glVertex3f(-a, b, -a);
@@ -506,6 +538,8 @@ void skybox(float a, float b)
 	//	glTexCoord2f(1.0f, 1.0f); glVertex3f(a, b, -a);
 	//	glTexCoord2f(1.0f, 0.0f); glVertex3f(a, -b, -a);
 	//glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void cabinet(float a, float b)
@@ -567,6 +601,8 @@ void cabinet(float a, float b)
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-15, -2, b);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(-15, -10, b);
 	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 //void renderFirst()  //Render scene except target object(s)(in this case, the barrier) to the depth texture.
