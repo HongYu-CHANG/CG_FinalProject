@@ -32,7 +32,7 @@ GLuint texture[TEXTURE_NUM];
 
 void cabinet(float a, float b);
 void skybox(float a, float b);
-
+void painting();
 
 extern "C"
 {
@@ -54,9 +54,9 @@ GLuint program;
 GLuint vaoHandle;
 GLuint vbo_ids[3];
 Vertex *vertices;
-//void renderFirst();
-//void renderSecond();
-void renderThird();
+void renderFirst();
+void renderSecond();
+void renderThird(float a, float b, float c);
 GLfloat mycolor = 0;
 GLfloat frequency = 2;
 bool renderBool = true;
@@ -75,10 +75,13 @@ GLuint loadTexture(char* name, GLfloat width, GLfloat height);
 
 namespace
 {
-	char *obj_file_dir = "../Resources/Ball.obj";
+	//char *obj_file_dir = "../Resources/Ball.obj";
+	char *obj_file_dir = "../Resources/bunny.obj";
 	char *bunny_file_dir = "../Resources/bunny.obj";
 	char *teapot_file_dir = "../Resources/teapot.obj";
 	char *main_tex_dir = "../Resources/honey_comb_master.ppm";
+	//char *main_tex_dir = "../Resources/Stone.ppm";
+	
 	
 	GLfloat light_rad = 0.05;//radius of the light bulb
 	float eyet = 0.0;//theta in degree
@@ -364,8 +367,10 @@ void init(void)
 	// APIs for creating shaders and creating shader programs have been done by TAs
 	// following is an example for creating a shader program using given vertex shader and fragment shader
 	// create program
-	GLuint vert = createShader("Shaders/barrier.vert", "vertex");
-	GLuint frag = createShader("Shaders/barrier.frag", "fragment");
+	//GLuint vert = createShader("Shaders/barrier.vert", "vertex");
+	//GLuint frag = createShader("Shaders/barrier.frag", "fragment");
+	GLuint vert = createShader("Shaders/final.vert", "vertex");
+	GLuint frag = createShader("Shaders/final.frag", "fragment");
 	program = createProgram(vert, frag);
 }
 
@@ -375,68 +380,22 @@ void display(void)
 
 	//you may need to do something here(declare some local variables you need and maybe load Model matrix here...)
 
+	//HW3↓
+	//renderFirst();
+	//renderSecond();
+	//HW3↑
 
+	//final
 	glPushMatrix();
+
+
 	skybox(15, 10);
 
 	cabinet(12, 8);
 	cabinet(2, -2);
 	cabinet(-8, -12);
 
-
-	//mucha
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[2]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, -6.9475f);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, -6.9475f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -10.6775f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -10.6775f);
-	glEnd();
-
-	//kiss
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[3]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 2.425f);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 2.425f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -2.625f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -2.625f);
-	glEnd();
-
-	//piano
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[4]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 10.6775f);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 10.6775f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 6.7475f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, 6.7475f);
-	glEnd();
-
-	//star
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[5]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-		/*glTexCoord2f(0.0f, 0.0f); glVertex3f(-3.14f, -2.5f, 14.9f);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-3.14f, 2.5f, 14.9f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(3.14f, -2.5f, 14.9f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);*/
-		glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.9f);
-		glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.9f);
-		glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.9f);
-		glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.9f);
-	glEnd();
-
-	glBindTexture(GL_TEXTURE_2D, 0);
+	painting();
 
 	glPopMatrix();
 	//glEnable(GL_CULL_FACE);
@@ -457,14 +416,135 @@ void display(void)
 		1.0,
 		0.0);
 	glPushMatrix();
-		glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-		glRotatef(ball_rot[0], 1, 0, 0);
-		glRotatef(ball_rot[1], 0, 1, 0);
-		glRotatef(ball_rot[2], 0, 0, 1);
+
 	// please try not to modify the previous block of code
 
 	// you may need to do something here(pass uniform variable(s) to shader and render the model)
-		//renderThird();
+
+	//HW3↓
+
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, honeyTextureID);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, depthTextureID);
+
+
+	renderFirst();
+
+	GLfloat V[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, V);
+
+
+	//no.1
+	glUseProgram(program);
+
+	GLuint loc;
+	GLfloat M[16], P[16];
+
+	loc = glGetUniformLocation(program, "honeyTex");
+	glUniform1i(loc, 0);
+	loc = glGetUniformLocation(program, "depthTex");
+	glUniform1i(loc, 1);
+
+	glLoadIdentity();
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, M);
+	glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	loc = glGetUniformLocation(program, "V");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+	loc = glGetUniformLocation(program, "M");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+	loc = glGetUniformLocation(program, "P");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+
+
+	loc = glGetUniformLocation(program, "eye");
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+	glUniform3fv(loc, 1, eye);
+
+	loc = glGetUniformLocation(program, "time");
+	glUniform1f(loc, time);
+
+
+	glPopMatrix();
+
+
+	glBindVertexArray(vaoHandle);
+	glActiveTexture(GL_TEXTURE0);
+	glScalef(0.3, 0.3, 0.3);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);
+
+
+	glUseProgram(NULL);
+
+	//no.1
+	glUseProgram(program);
+
+	GLuint loc;
+	GLfloat M[16], P[16];
+
+	loc = glGetUniformLocation(program, "honeyTex");
+	glUniform1i(loc, 0);
+	loc = glGetUniformLocation(program, "depthTex");
+	glUniform1i(loc, 1);
+
+	glLoadIdentity();
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, M);
+	glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	loc = glGetUniformLocation(program, "V");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+	loc = glGetUniformLocation(program, "M");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+	loc = glGetUniformLocation(program, "P");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+
+
+	loc = glGetUniformLocation(program, "eye");
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+	glUniform3fv(loc, 1, eye);
+
+	loc = glGetUniformLocation(program, "time");
+	glUniform1f(loc, time);
+
+
+	glPopMatrix();
+
+
+	glBindVertexArray(vaoHandle);
+	glActiveTexture(GL_TEXTURE0);
+	glScalef(0.3, 0.3, 0.3);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);
+
+
+	glUseProgram(NULL);
+
+
+
+	//HW3↓
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+
+
+	//HW3↑
+
 	//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
 
 	glPopMatrix();
@@ -604,68 +684,128 @@ void cabinet(float a, float b)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
-
-//void renderFirst()  //Render scene except target object(s)(in this case, the barrier) to the depth texture.
-//{
-//	//ref:https://tiankefeng0520.iteye.com/blog/2008008
-//	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//綁定我們自己建立的深度緩衝區
-//	glEnable(GL_DEPTH_TEST);//開啟深度緩衝區
-//	glDepthMask(GL_TRUE);//GL_TRUE代表深度緩衝區可讀寫
-//
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//	//開始寫入圖像內容到我們自己的緩衝區，這個動作代表我們可以對寫到緩衝區裡面的所有內容直接加工(使用depthTex)：參照 http://blog.shenyuanluo.com/LearnOpenGLNote25.html 的第7點
-//	glPushMatrix();
-//	glScalef(0.3, 0.3, 0.3);
-//	glTranslatef(-2.1, 3.3 - fmod(time, 3), 1.3);
-//	glmDraw(teapotModel, GLM_TEXTURE);
-//	glPopMatrix();
-//
-//	glPushMatrix();
-//	glScalef(0.3, 0.3, 0.3);
-//	glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
-//	glmDraw(bunnyModel, GLM_TEXTURE);
-//	glPopMatrix();
-//
-//	// floor
-//	glDisable(GL_CULL_FACE);
-//	glPushMatrix();
-//	glScalef(30, 1, 30);
-//	glTranslatef(0.0f, 0.0f, 0.0f);
-//	glBegin(GL_TRIANGLE_STRIP);
-//
-//	glColor3f(1, 1, 1);
-//	glVertex3f(1, -0.032, 1);
-//	glVertex3f(1, -0.031, -1);
-//	glVertex3f(-1, -0.032, 1);
-//	glVertex3f(-1, -0.031, -1);
-//
-//	glEnd();
-//	glPopMatrix();
-//	glEnable(GL_CULL_FACE);
-//
-//	glBindFramebuffer(GL_FRAMEBUFFER, 0);//使深度緩衝區恢復為預設緩衝區，如果註解掉，螢幕會全黑
-//}
-
-
-//void renderSecond()
-//{
-//	// looping teapot and bunny
-//	glPushMatrix();
-//	glScalef(0.3, 0.3, 0.3);
-//	glTranslatef(-2.1, 3.3 - fmod(time, 3), 1.3);
-//	glmDraw(teapotModel, GLM_TEXTURE);
-//	glPopMatrix();
-//
-//	glPushMatrix();
-//	glScalef(0.3, 0.3, 0.3);
-//	glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
-//	glmDraw(bunnyModel, GLM_TEXTURE);
-//	glPopMatrix();
-//
-//}
-
-void renderThird() //Render target object(s) using depth texture.
+void painting() 
 {
+	//mucha
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[2]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, -6.9475f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, -6.9475f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -10.6775f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -10.6775f);
+	glEnd();
+
+	//kiss
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[3]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 2.425f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 2.425f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -2.625f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -2.625f);
+	glEnd();
+
+	//piano
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[4]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 10.6775f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 10.6775f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 6.7475f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, 6.7475f);
+	glEnd();
+
+	//star
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[5]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	/*glTexCoord2f(0.0f, 0.0f); glVertex3f(-3.14f, -2.5f, 14.9f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-3.14f, 2.5f, 14.9f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(3.14f, -2.5f, 14.9f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);*/
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.9f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.9f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.9f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.9f);
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+
+void renderFirst()  //Render scene except target object(s)(in this case, the barrier) to the depth texture.
+{
+	//ref:https://tiankefeng0520.iteye.com/blog/2008008
+	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//綁定我們自己建立的深度緩衝區
+	//glEnable(GL_DEPTH_TEST);//開啟深度緩衝區
+	//glDepthMask(GL_TRUE);//GL_TRUE代表深度緩衝區可讀寫
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//開始寫入圖像內容到我們自己的緩衝區，這個動作代表我們可以對寫到緩衝區裡面的所有內容直接加工(使用depthTex)：參照 http://blog.shenyuanluo.com/LearnOpenGLNote25.html 的第7點
+	//glPushMatrix();
+	//glScalef(0.3, 0.3, 0.3);
+	//glTranslatef(-2.1, 3.3 - fmod(time, 3), 1.3);
+	//glmDraw(teapotModel, GLM_TEXTURE);
+	//glPopMatrix();
+
+	//glPushMatrix();
+	//glScalef(0.3, 0.3, 0.3);
+	//glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
+	//glmDraw(bunnyModel, GLM_TEXTURE);
+	//glPopMatrix();
+
+	//// floor
+	//glDisable(GL_CULL_FACE);
+	//glPushMatrix();
+	//glScalef(30, 1, 30);
+	//glTranslatef(0.0f, 0.0f, 0.0f);
+	//glBegin(GL_TRIANGLE_STRIP);
+
+	//glColor3f(1, 1, 1);
+	//glVertex3f(1, -0.032, 1);
+	//glVertex3f(1, -0.031, -1);
+	//glVertex3f(-1, -0.032, 1);
+	//glVertex3f(-1, -0.031, -1);
+
+	//glEnd();
+	//glPopMatrix();
+	//glEnable(GL_CULL_FACE);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);//使深度緩衝區恢復為預設緩衝區，如果註解掉，螢幕會全黑
+}
+
+
+void renderSecond()
+{
+	// looping teapot and bunny
+	glPushMatrix();
+	glScalef(0.3, 0.3, 0.3);
+	glTranslatef(-2.1, 3.3 - fmod(time, 3), 1.3);
+	glmDraw(teapotModel, GLM_TEXTURE);
+	glPopMatrix();
+
+	glPushMatrix();
+	glScalef(0.3, 0.3, 0.3);
+	glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
+	glmDraw(bunnyModel, GLM_TEXTURE);
+	glPopMatrix();
+
+}
+
+void renderThird(float a, float b, float c) //Render target object(s) using depth texture.
+{
+
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, honeyTextureID);
 	glActiveTexture(GL_TEXTURE1);
@@ -674,40 +814,40 @@ void renderThird() //Render target object(s) using depth texture.
 
 	glUseProgram(program);
 
-	GLuint loc;
-	GLfloat M[16], P[16], V[16];
+		GLuint loc;
+		GLfloat M[16], P[16], V[16];
 
-	loc = glGetUniformLocation(program, "honeyTex");
-	glUniform1i(loc, 0);
-	loc = glGetUniformLocation(program, "depthTex");
-	glUniform1i(loc, 1);
+		loc = glGetUniformLocation(program, "honeyTex");
+		glUniform1i(loc, 0);
+		loc = glGetUniformLocation(program, "depthTex");
+		glUniform1i(loc, 1);
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, V);
+		glGetFloatv(GL_MODELVIEW_MATRIX, V);
 
-	glLoadIdentity();
-	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
+		glLoadIdentity();
+		glTranslatef(a, b, c);
+		glRotatef(ball_rot[0], 1, 0, 0);
+		glRotatef(ball_rot[1], 0, 1, 0);
+		glRotatef(ball_rot[2], 0, 0, 1);
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, M);
-	glGetFloatv(GL_PROJECTION_MATRIX, P);
+		glGetFloatv(GL_MODELVIEW_MATRIX, M);
+		glGetFloatv(GL_PROJECTION_MATRIX, P);
 
-	loc = glGetUniformLocation(program, "V");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-	loc = glGetUniformLocation(program, "M");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-	loc = glGetUniformLocation(program, "P");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+		loc = glGetUniformLocation(program, "V");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+		loc = glGetUniformLocation(program, "M");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+		loc = glGetUniformLocation(program, "P");
+		glUniformMatrix4fv(loc, 1, GL_FALSE, P);
 
 
-	loc = glGetUniformLocation(program, "eye");
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
-	glUniform3fv(loc, 1, eye);
+		loc = glGetUniformLocation(program, "eye");
+		eye[0] = eyex;
+		eye[1] = eyey;
+		eye[2] = eyez;
+		glUniform3fv(loc, 1, eye);
 
-	loc = glGetUniformLocation(program, "time");
+		loc = glGetUniformLocation(program, "time");
 	glUniform1f(loc, time);
 
 	//Bonus:
@@ -719,15 +859,16 @@ void renderThird() //Render target object(s) using depth texture.
 
 	glPopMatrix();
 
-	//繪製透明圖片（地板）：https://blog.csdn.net/huutu/article/details/20872525
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);//關掉面剔除(把非正面朝向的面保留)
-	glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE);//不能用這個，地板會被透過去(目標色會覆蓋源色)
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//https://blog.csdn.net/alicehyxx/article/details/4263058
+	////繪製透明圖片（地板）：https://blog.csdn.net/huutu/article/details/20872525
+	//glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_CULL_FACE);//關掉面剔除(把非正面朝向的面保留)
+	//glEnable(GL_BLEND);
+	////glBlendFunc(GL_SRC_ALPHA, GL_ONE);//不能用這個，地板會被透過去(目標色會覆蓋源色)
+	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//https://blog.csdn.net/alicehyxx/article/details/4263058
 
 	glBindVertexArray(vaoHandle);
 	glActiveTexture(GL_TEXTURE0);
+	glScalef(0.3, 0.3, 0.3);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
 	glBindVertexArray(0);
 
