@@ -51,6 +51,14 @@ struct Vertex
 };
 typedef struct Vertex Vertex;
 GLuint program;
+
+//final
+GLuint programPhong;
+GLuint programDissolve;
+GLuint programRamp;
+GLuint programBonus;
+int count = 0;
+
 GLuint vaoHandle;
 GLuint vbo_ids[3];
 Vertex *vertices;
@@ -81,6 +89,8 @@ namespace
 	char *teapot_file_dir = "../Resources/teapot.obj";
 	char *main_tex_dir = "../Resources/honey_comb_master.ppm";
 	//char *main_tex_dir = "../Resources/Stone.ppm";
+	char *noise_tex_dir = "../Resources/Noise.ppm";
+	char *ramp_tex_dir = "../Resources/Ramp.ppm";
 	
 	
 	GLfloat light_rad = 0.05;//radius of the light bulb
@@ -125,11 +135,11 @@ const float rotation_speed = 0.05; // ball rotating speed
 
 // No need for model texture, 'cause glmModel() has already loaded it for you.
 // To use the texture, check glmModel documentation.
-/*
+
 GLuint mainTextureID; // TA has already loaded this texture for you
 GLuint noiseTextureID; // TA has already loaded this texture for you
 GLuint rampTextureID; // TA has already loaded this texture for you
-*/
+
 
 GLMmodel *model, *bunnyModel, *teapotModel; //TA has already loaded the model for you(!but you still need to convert it to VBO(s)!)
 
@@ -238,6 +248,10 @@ void init(void)
 	Image* upWallTex = loadTexture(texture_name[6]);//upWall
 	Image* downWallTex = loadTexture(texture_name[7]);//downWall
 	
+	mainTextureID = loadTexture(main_tex_dir, 512, 256);
+	noiseTextureID = loadTexture(noise_tex_dir, 360, 360);
+	rampTextureID = loadTexture(ramp_tex_dir, 256, 256);
+
 	glEnable(GL_TEXTURE_2D);
 	glGenTextures(8, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -369,15 +383,33 @@ void init(void)
 	// create program
 	//GLuint vert = createShader("Shaders/barrier.vert", "vertex");
 	//GLuint frag = createShader("Shaders/barrier.frag", "fragment");
+	
 	GLuint vert = createShader("Shaders/final.vert", "vertex");
 	GLuint frag = createShader("Shaders/final.frag", "fragment");
 	program = createProgram(vert, frag);
+
+	GLuint vertPhong = createShader("Shaders/phong.vert", "vertex");
+	GLuint fragPhong = createShader("Shaders/phong.frag", "fragment");
+	programPhong = createProgram(vertPhong, fragPhong);
+
+	GLuint vertDissolve = createShader("Shaders/dissolve.vert", "vertex");
+	GLuint fragDissolve = createShader("Shaders/dissolve.frag", "fragment");
+	programDissolve = createProgram(vertDissolve, fragDissolve);
+
+	GLuint vertRamp = createShader("Shaders/ramp.vert", "vertex");
+	GLuint fragRamp = createShader("Shaders/ramp.frag", "fragment");
+	programRamp = createProgram(vertRamp, fragRamp);
+
+	GLuint vertBonus = createShader("Shaders/bonus.vert", "vertex");
+	GLuint fragBonus = createShader("Shaders/bonus.frag", "fragment");
+	programBonus = createProgram(vertBonus, fragBonus);
 }
 
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	
 	//you may need to do something here(declare some local variables you need and maybe load Model matrix here...)
 
 	//HW3¡õ
@@ -402,148 +434,388 @@ void display(void)
 
 	//-----
 
-	//please try not to modify the following block of code(you can but you are not supposed to)
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(
-		eyex, 
-		eyey, 
-		eyez,
-		eyex+cos(eyet*M_PI/180)*cos(eyep*M_PI / 180), 
-		eyey+sin(eyet*M_PI / 180), 
-		eyez-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
-		0.0,
-		1.0,
-		0.0);
-	glPushMatrix();
+	////please try not to modify the following block of code(you can but you are not supposed to)
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity();
+	//gluLookAt(
+	//	eyex, 
+	//	eyey, 
+	//	eyez,
+	//	eyex+cos(eyet*M_PI/180)*cos(eyep*M_PI / 180), 
+	//	eyey+sin(eyet*M_PI / 180), 
+	//	eyez-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+	//	0.0,
+	//	1.0,
+	//	0.0);
+	//glPushMatrix();
 
 	// please try not to modify the previous block of code
 
 	// you may need to do something here(pass uniform variable(s) to shader and render the model)
 
-	//HW3¡õ
 
+	////////////////////////////////////
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, honeyTextureID);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, depthTextureID);
-
-
-	renderFirst();
-
-	GLfloat V[16];
+	GLuint loc;
+	GLfloat MV[16], P[16], V[16];
+	glPushMatrix();
+	glLoadIdentity();
+	gluLookAt(eyex, eyey, eyez,
+		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), eyey + sin(eyet*M_PI / 180), eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+		0.0, 1.0, 0.0);
 	glGetFloatv(GL_MODELVIEW_MATRIX, V);
+	glPopMatrix();
 
-
-	//no.1
-	glUseProgram(program);
-
-	GLuint loc;
-	GLfloat M[16], P[16];
-
-	loc = glGetUniformLocation(program, "honeyTex");
-	glUniform1i(loc, 0);
-	loc = glGetUniformLocation(program, "depthTex");
-	glUniform1i(loc, 1);
-
+	//please try not to modify the following block of code(you can but you are not supposed to)
+	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	gluLookAt(
+		eyex,
+		eyey,
+		eyez,
+		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180),
+		eyey + sin(eyet*M_PI / 180),
+		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+		0.0,
+		1.0,
+		0.0);
+	//draw_light_bulb();
+
+	//original code
+	//glPushMatrix();
+	//	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+	//	//glRotatef(ball_rot[0], 1, 0, 0);
+	//	//glRotatef(ball_rot[1], 0, 1, 0);
+	//	//glRotatef(ball_rot[2], 0, 0, 1);
+	//	
+	//// please try not to modify the previous block of code
+
+	//// you may need to do something here(pass uniform variable(s) to shader and render the model)
+	//	//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
+	//	
+	//	eye[0] = eyex;
+	//	eye[1] = eyey;
+	//	eye[2] = eyez;
+	//	
+	//	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
+	//	glGetFloatv(GL_PROJECTION_MATRIX, P);
+	//original code end
+
+
+	//try more than 1 model
+
+	glPushMatrix();
+
+	//no. 1
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
+	//glTranslatef(-13, 0, 10);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+
+	//GLfloat GLtime = time;
+	//GLfloat GLobjectY = 3.3 - fmod(time, 3);
+	//glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
+	glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	glUseProgram(programPhong);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model->textures[0].id);
+
+	glUniform1i(glGetUniformLocation(programPhong, "Tex"), 0);
+
+	loc = glGetUniformLocation(programPhong, "MV");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, MV);
+	loc = glGetUniformLocation(programPhong, "P");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+	loc = glGetUniformLocation(programPhong, "V");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+
+	// pass material
+	loc = glGetUniformLocation(programPhong, "ambient");
+	glUniform4fv(loc, 1, model->materials[1].ambient);
+	loc = glGetUniformLocation(programPhong, "diffuse");
+	glUniform4fv(loc, 1, model->materials[1].diffuse);
+	loc = glGetUniformLocation(programPhong, "specular");
+	glUniform4fv(loc, 1, model->materials[1].specular);
+
+	loc = glGetUniformLocation(programPhong, "shiness");
+	glUniform1fv(loc, 1, &(model->materials[1].shininess));
+
+	loc = glGetUniformLocation(programPhong, "Light_position");
+	glUniform3fv(loc, 1, light_pos);
+	loc = glGetUniformLocation(programPhong, "eye");
+	glUniform3fv(loc, 1, eye);
+
+	glBindVertexArray(vaoHandle);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, NULL);
+	glUseProgram(NULL);
+
+	//no. 2
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
+	//glTranslatef(-13, 0, 0);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
+	glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	glUseProgram(programRamp);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model->textures[0].id);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, rampTextureID);
+
+	glUniform1i(glGetUniformLocation(programRamp, "Tex"), 0);
+	glUniform1i(glGetUniformLocation(programRamp, "rampTexture"), 1);
+
+	loc = glGetUniformLocation(programRamp, "MV");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, MV);
+	loc = glGetUniformLocation(programRamp, "P");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+	loc = glGetUniformLocation(programRamp, "V");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+
+	// pass material
+	loc = glGetUniformLocation(programRamp, "ambient");
+	glUniform4fv(loc, 1, model->materials[1].ambient);
+	loc = glGetUniformLocation(programRamp, "diffuse");
+	glUniform4fv(loc, 1, model->materials[1].diffuse);
+	loc = glGetUniformLocation(programRamp, "specular");
+	glUniform4fv(loc, 1, model->materials[1].specular);
+
+	loc = glGetUniformLocation(programRamp, "shiness");
+	glUniform1fv(loc, 1, &(model->materials[1].shininess));
+
+	loc = glGetUniformLocation(programRamp, "Light_position");
+	glUniform3fv(loc, 1, light_pos);
+	loc = glGetUniformLocation(programRamp, "eye");
+	glUniform3fv(loc, 1, eye);
+
+	glBindVertexArray(vaoHandle);
+	//glActiveTexture(GL_TEXTURE0);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);
+
+	/*glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, NULL);*/
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, NULL);
+	glUseProgram(NULL);
+
+	//no. 3
+	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
+	//glTranslatef(-13, 0, -10);
+	glRotatef(ball_rot[0], 1, 0, 0);
+	glRotatef(ball_rot[1], 0, 1, 0);
+	glRotatef(ball_rot[2], 0, 0, 1);
+
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+
+	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
+	glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	count++;
+	if (count >= 1000) {
+		count = 0;
+	}
+
+	glUseProgram(programBonus);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, model->textures[0].id);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, noiseTextureID);
+
+	glUniform1i(glGetUniformLocation(programDissolve, "Tex"), 0);
+	glUniform1i(glGetUniformLocation(programDissolve, "rampTexture"), 1);
+
+	//dissolve factor control
+	loc = glGetUniformLocation(programDissolve, "dissolveFactor");
+	glUniform1f(loc, count * 0.00075f);
+
+	loc = glGetUniformLocation(programDissolve, "MV");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, MV);
+	loc = glGetUniformLocation(programDissolve, "P");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+	loc = glGetUniformLocation(programDissolve, "V");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+
+	// pass material
+	loc = glGetUniformLocation(programDissolve, "ambient");
+	glUniform4fv(loc, 1, model->materials[1].ambient);
+	loc = glGetUniformLocation(programDissolve, "diffuse");
+	glUniform4fv(loc, 1, model->materials[1].diffuse);
+	loc = glGetUniformLocation(programDissolve, "specular");
+	glUniform4fv(loc, 1, model->materials[1].specular);
+
+	loc = glGetUniformLocation(programDissolve, "shiness");
+	glUniform1fv(loc, 1, &(model->materials[1].shininess));
+
+	loc = glGetUniformLocation(programDissolve, "Light_position");
+	glUniform3fv(loc, 1, light_pos);
+	loc = glGetUniformLocation(programDissolve, "eye");
+	glUniform3fv(loc, 1, eye);
+
+	glBindVertexArray(vaoHandle);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);
+
+	glBindTexture(GL_TEXTURE_2D, NULL);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, NULL);
+	glUseProgram(NULL);
+
 	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
 
-	glGetFloatv(GL_MODELVIEW_MATRIX, M);
-	glGetFloatv(GL_PROJECTION_MATRIX, P);
+	glDisable(GL_TEXTURE_2D);
 
-	loc = glGetUniformLocation(program, "V");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-	loc = glGetUniformLocation(program, "M");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-	loc = glGetUniformLocation(program, "P");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
-
-
-	loc = glGetUniformLocation(program, "eye");
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
-	glUniform3fv(loc, 1, eye);
-
-	loc = glGetUniformLocation(program, "time");
-	glUniform1f(loc, time);
-
-
-	glPopMatrix();
-
-
-	glBindVertexArray(vaoHandle);
-	glActiveTexture(GL_TEXTURE0);
-	glScalef(0.3, 0.3, 0.3);
-	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-	glBindVertexArray(0);
-
-
-	glUseProgram(NULL);
-
-	//no.1
-	glUseProgram(program);
-
-	GLuint loc;
-	GLfloat M[16], P[16];
-
-	loc = glGetUniformLocation(program, "honeyTex");
-	glUniform1i(loc, 0);
-	loc = glGetUniformLocation(program, "depthTex");
-	glUniform1i(loc, 1);
-
-	glLoadIdentity();
-	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
-
-	glGetFloatv(GL_MODELVIEW_MATRIX, M);
-	glGetFloatv(GL_PROJECTION_MATRIX, P);
-
-	loc = glGetUniformLocation(program, "V");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-	loc = glGetUniformLocation(program, "M");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-	loc = glGetUniformLocation(program, "P");
-	glUniformMatrix4fv(loc, 1, GL_FALSE, P);
-
-
-	loc = glGetUniformLocation(program, "eye");
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
-	glUniform3fv(loc, 1, eye);
-
-	loc = glGetUniformLocation(program, "time");
-	glUniform1f(loc, time);
-
-
-	glPopMatrix();
-
-
-	glBindVertexArray(vaoHandle);
-	glActiveTexture(GL_TEXTURE0);
-	glScalef(0.3, 0.3, 0.3);
-	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-	glBindVertexArray(0);
-
-
-	glUseProgram(NULL);
-
-
+	////////////////////////////////////
 
 	//HW3¡õ
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
 
 
-	//HW3¡ô
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, honeyTextureID);
+	//glActiveTexture(GL_TEXTURE1);
+	//glBindTexture(GL_TEXTURE_2D, depthTextureID);
+
+
+	//renderFirst();
+
+	//GLfloat V[16];
+	//glGetFloatv(GL_MODELVIEW_MATRIX, V);
+
+
+	////no.1
+	//glUseProgram(program);
+
+	//GLuint loc;
+	//GLfloat M[16], P[16];
+
+	//loc = glGetUniformLocation(program, "honeyTex");
+	//glUniform1i(loc, 0);
+	//loc = glGetUniformLocation(program, "depthTex");
+	//glUniform1i(loc, 1);
+
+	//glLoadIdentity();
+	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+	//glRotatef(ball_rot[0], 1, 0, 0);
+	//glRotatef(ball_rot[1], 0, 1, 0);
+	//glRotatef(ball_rot[2], 0, 0, 1);
+
+	//glGetFloatv(GL_MODELVIEW_MATRIX, M);
+	//glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	//loc = glGetUniformLocation(program, "V");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+	//loc = glGetUniformLocation(program, "M");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+	//loc = glGetUniformLocation(program, "P");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+
+
+	//loc = glGetUniformLocation(program, "eye");
+	//eye[0] = eyex;
+	//eye[1] = eyey;
+	//eye[2] = eyez;
+	//glUniform3fv(loc, 1, eye);
+
+	//loc = glGetUniformLocation(program, "time");
+	//glUniform1f(loc, time);
+
+
+	//glPopMatrix();
+
+
+	//glBindVertexArray(vaoHandle);
+	//glActiveTexture(GL_TEXTURE0);
+	//glScalef(0.3, 0.3, 0.3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	//glBindVertexArray(0);
+
+
+	//glUseProgram(NULL);
+
+	////no.1
+	//glUseProgram(program);
+
+	//GLuint loc;
+	//GLfloat M[16], P[16];
+
+	//loc = glGetUniformLocation(program, "honeyTex");
+	//glUniform1i(loc, 0);
+	//loc = glGetUniformLocation(program, "depthTex");
+	//glUniform1i(loc, 1);
+
+	//glLoadIdentity();
+	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
+	//glRotatef(ball_rot[0], 1, 0, 0);
+	//glRotatef(ball_rot[1], 0, 1, 0);
+	//glRotatef(ball_rot[2], 0, 0, 1);
+
+	//glGetFloatv(GL_MODELVIEW_MATRIX, M);
+	//glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+	//loc = glGetUniformLocation(program, "V");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+	//loc = glGetUniformLocation(program, "M");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+	//loc = glGetUniformLocation(program, "P");
+	//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+
+
+	//loc = glGetUniformLocation(program, "eye");
+	//eye[0] = eyex;
+	//eye[1] = eyey;
+	//eye[2] = eyez;
+	//glUniform3fv(loc, 1, eye);
+
+	//loc = glGetUniformLocation(program, "time");
+	//glUniform1f(loc, time);
+
+
+	//glPopMatrix();
+
+
+	//glBindVertexArray(vaoHandle);
+	//glActiveTexture(GL_TEXTURE0);
+	//glScalef(0.3, 0.3, 0.3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	//glBindVertexArray(0);
+
+
+	//glUseProgram(NULL);
+
+
+
+	////HW3¡õ
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+
+
+	////HW3¡ô
 
 	//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
 
