@@ -905,10 +905,10 @@ void cabinet(float a, float b)
 	glTranslatef(0.0f, 0.0f, 0.0f);
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
 	//up
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-11, -2, a);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-11, -2, b);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(-15, -2, a);
@@ -917,7 +917,7 @@ void cabinet(float a, float b)
 
 	//down
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-15, -10, b);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-15, -10, a);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-11, -10, b);
@@ -926,7 +926,7 @@ void cabinet(float a, float b)
 
 	//far
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-15, -2, a);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-15, -10, a);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-11, -2, a);
@@ -935,7 +935,7 @@ void cabinet(float a, float b)
 
 	//left
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-11, -2, a);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-11, -10, a);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-11, -2, b);
@@ -944,7 +944,7 @@ void cabinet(float a, float b)
 
 	//right
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-15, -2, b);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-15, -10, b);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-15, -2, a);
@@ -953,7 +953,7 @@ void cabinet(float a, float b)
 
 	//near
 	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 0, 1);
+	glColor3f(1, 1, 1);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-11, -2, b);
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-11, -10, b);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(-15, -2, b);

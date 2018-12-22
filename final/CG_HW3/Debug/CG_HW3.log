@@ -1,3 +1,3 @@
 ﻿  main.cpp
-c:\users\harrisqs\desktop\cg_finalproject\final\cg_hw3\main.cpp(348): warning C4018: '<': signed/unsigned 不相符
-  CG_HW3.vcxproj -> C:\Users\HarrisQs\Desktop\CG_FinalProject\final\Debug\CG_HW3.exe
+d:\宜蓁\交通大學\碩二\計算機圖學\final project\cg_finalproject\final\cg_hw3\main.cpp(348): warning C4018: '<': signed/unsigned 不相符
+  CG_HW3.vcxproj -> D:\宜蓁\交通大學\碩二\計算機圖學\final project\CG_FinalProject\final\Debug\CG_HW3.exe
