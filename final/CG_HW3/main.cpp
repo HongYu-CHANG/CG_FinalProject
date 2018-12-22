@@ -512,7 +512,7 @@ void display(void)
 	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
 	glScalef(1, 1, 1);
 	glTranslatef(-13, 0, 10);
-	glRotatef(90, 0, 1, 0);
+	glRotatef(3.3 + (time * 100), 0, 1, 0);
 	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
@@ -562,9 +562,11 @@ void display(void)
 	//no. 2
 	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
 	glScalef(0.5, 0.5, 0.5);
-	glRotatef(90, 0, -1, 0);
-	glTranslatef(0, 0, -10);
-	glRotatef(90, 0, 1, 0);
+	glRotatef(3.3 + (time * 100), 0, -1, 0);
+	glTranslatef(13, 0, -10);
+	glTranslatef(-13, 0, 0);
+	//glRotatef(90, 0, 1, 0);
+	glRotatef(3.3 + (time * 200), 0, 1, 0);
 	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
@@ -615,13 +617,14 @@ void display(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glUseProgram(NULL);
-
 	//no. 3
 	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
+	
 	glScalef(0.5, 0.5, 0.5);
-	glRotatef(90, 0, -1, 0);
-	glTranslatef(0, 0, -10);
-	glRotatef(90, 0, 1, 0);
+	glRotatef(3.3 + (time * 200), 0, -1, 0);
+	glTranslatef(13, 0, 0);
+	glTranslatef(-13, 0, -10);
+	glRotatef(3.3 + (time * 300), 0, 1, 0);
 	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
@@ -690,7 +693,9 @@ void display(void)
 
 	////////////////////////////////////
 
+	
 	//HW3↓
+	/*
 	//以下if為縮排用
 	if(1){
 		//glActiveTexture(GL_TEXTURE0);
@@ -814,6 +819,10 @@ void display(void)
 
 		//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
 	}
+	
+	
+	
+	*/
 	//HW3↑
 	
 	glPopMatrix();
