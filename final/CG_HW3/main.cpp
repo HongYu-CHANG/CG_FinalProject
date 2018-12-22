@@ -504,22 +504,20 @@ void display(void)
 
 	//try more than 1 model
 
+	//std::cout << ball_pos[0] << " " << ball_pos[1] << " " << ball_pos[2] << std::endl;
+
 	glPushMatrix();
 
 	//no. 1
-	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
-	//glTranslatef(-13, 0, 10);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
+	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
+	glScalef(1, 1, 1);
+	glTranslatef(-13, 0, 10);
+	glRotatef(90, 0, 1, 0);
+	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
 	eye[1] = eyey;
 	eye[2] = eyez;
-
-	//GLfloat GLtime = time;
-	//GLfloat GLobjectY = 3.3 - fmod(time, 3);
-	//glTranslatef(2, 3.3 - fmod(time, 3), 1.4);
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
 	glGetFloatv(GL_PROJECTION_MATRIX, P);
@@ -562,11 +560,12 @@ void display(void)
 	glUseProgram(NULL);
 
 	//no. 2
-	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
-	//glTranslatef(-13, 0, 0);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
+	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
+	glScalef(0.5, 0.5, 0.5);
+	glRotatef(90, 0, -1, 0);
+	glTranslatef(0, 0, -10);
+	glRotatef(90, 0, 1, 0);
+	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
 	eye[1] = eyey;
@@ -610,22 +609,20 @@ void display(void)
 	glUniform3fv(loc, 1, eye);
 
 	glBindVertexArray(vaoHandle);
-	//glActiveTexture(GL_TEXTURE0);
 	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
 	glBindVertexArray(0);
 
-	/*glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, NULL);*/
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glUseProgram(NULL);
 
 	//no. 3
-	glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
-	//glTranslatef(-13, 0, -10);
-	glRotatef(ball_rot[0], 1, 0, 0);
-	glRotatef(ball_rot[1], 0, 1, 0);
-	glRotatef(ball_rot[2], 0, 0, 1);
+	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
+	glScalef(0.5, 0.5, 0.5);
+	glRotatef(90, 0, -1, 0);
+	glTranslatef(0, 0, -10);
+	glRotatef(90, 0, 1, 0);
+	glScalef(2, 2, 2);
 
 	eye[0] = eyex;
 	eye[1] = eyey;
@@ -694,131 +691,131 @@ void display(void)
 	////////////////////////////////////
 
 	//HW3↓
+	//以下if為縮排用
+	if(1){
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, honeyTextureID);
+		//glActiveTexture(GL_TEXTURE1);
+		//glBindTexture(GL_TEXTURE_2D, depthTextureID);
 
 
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, honeyTextureID);
-	//glActiveTexture(GL_TEXTURE1);
-	//glBindTexture(GL_TEXTURE_2D, depthTextureID);
+		//renderFirst();
+
+		//GLfloat V[16];
+		//glGetFloatv(GL_MODELVIEW_MATRIX, V);
 
 
-	//renderFirst();
+		////no.1
+		//glUseProgram(program);
 
-	//GLfloat V[16];
-	//glGetFloatv(GL_MODELVIEW_MATRIX, V);
+		//GLuint loc;
+		//GLfloat M[16], P[16];
 
+		//loc = glGetUniformLocation(program, "honeyTex");
+		//glUniform1i(loc, 0);
+		//loc = glGetUniformLocation(program, "depthTex");
+		//glUniform1i(loc, 1);
 
-	////no.1
-	//glUseProgram(program);
+		//glLoadIdentity();
+		//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
+		//glRotatef(ball_rot[0], 1, 0, 0);
+		//glRotatef(ball_rot[1], 0, 1, 0);
+		//glRotatef(ball_rot[2], 0, 0, 1);
 
-	//GLuint loc;
-	//GLfloat M[16], P[16];
+		//glGetFloatv(GL_MODELVIEW_MATRIX, M);
+		//glGetFloatv(GL_PROJECTION_MATRIX, P);
 
-	//loc = glGetUniformLocation(program, "honeyTex");
-	//glUniform1i(loc, 0);
-	//loc = glGetUniformLocation(program, "depthTex");
-	//glUniform1i(loc, 1);
-
-	//glLoadIdentity();
-	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-	//glRotatef(ball_rot[0], 1, 0, 0);
-	//glRotatef(ball_rot[1], 0, 1, 0);
-	//glRotatef(ball_rot[2], 0, 0, 1);
-
-	//glGetFloatv(GL_MODELVIEW_MATRIX, M);
-	//glGetFloatv(GL_PROJECTION_MATRIX, P);
-
-	//loc = glGetUniformLocation(program, "V");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-	//loc = glGetUniformLocation(program, "M");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-	//loc = glGetUniformLocation(program, "P");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+		//loc = glGetUniformLocation(program, "V");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+		//loc = glGetUniformLocation(program, "M");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+		//loc = glGetUniformLocation(program, "P");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
 
 
-	//loc = glGetUniformLocation(program, "eye");
-	//eye[0] = eyex;
-	//eye[1] = eyey;
-	//eye[2] = eyez;
-	//glUniform3fv(loc, 1, eye);
+		//loc = glGetUniformLocation(program, "eye");
+		//eye[0] = eyex;
+		//eye[1] = eyey;
+		//eye[2] = eyez;
+		//glUniform3fv(loc, 1, eye);
 
-	//loc = glGetUniformLocation(program, "time");
-	//glUniform1f(loc, time);
-
-
-	//glPopMatrix();
+		//loc = glGetUniformLocation(program, "time");
+		//glUniform1f(loc, time);
 
 
-	//glBindVertexArray(vaoHandle);
-	//glActiveTexture(GL_TEXTURE0);
-	//glScalef(0.3, 0.3, 0.3);
-	//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-	//glBindVertexArray(0);
+		//glPopMatrix();
 
 
-	//glUseProgram(NULL);
-
-	////no.1
-	//glUseProgram(program);
-
-	//GLuint loc;
-	//GLfloat M[16], P[16];
-
-	//loc = glGetUniformLocation(program, "honeyTex");
-	//glUniform1i(loc, 0);
-	//loc = glGetUniformLocation(program, "depthTex");
-	//glUniform1i(loc, 1);
-
-	//glLoadIdentity();
-	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
-	//glRotatef(ball_rot[0], 1, 0, 0);
-	//glRotatef(ball_rot[1], 0, 1, 0);
-	//glRotatef(ball_rot[2], 0, 0, 1);
-
-	//glGetFloatv(GL_MODELVIEW_MATRIX, M);
-	//glGetFloatv(GL_PROJECTION_MATRIX, P);
-
-	//loc = glGetUniformLocation(program, "V");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-	//loc = glGetUniformLocation(program, "M");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-	//loc = glGetUniformLocation(program, "P");
-	//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
+		//glBindVertexArray(vaoHandle);
+		//glActiveTexture(GL_TEXTURE0);
+		//glScalef(0.3, 0.3, 0.3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+		//glBindVertexArray(0);
 
 
-	//loc = glGetUniformLocation(program, "eye");
-	//eye[0] = eyex;
-	//eye[1] = eyey;
-	//eye[2] = eyez;
-	//glUniform3fv(loc, 1, eye);
+		//glUseProgram(NULL);
 
-	//loc = glGetUniformLocation(program, "time");
-	//glUniform1f(loc, time);
+		////no.1
+		//glUseProgram(program);
+
+		//GLuint loc;
+		//GLfloat M[16], P[16];
+
+		//loc = glGetUniformLocation(program, "honeyTex");
+		//glUniform1i(loc, 0);
+		//loc = glGetUniformLocation(program, "depthTex");
+		//glUniform1i(loc, 1);
+
+		//glLoadIdentity();
+		//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
+		//glRotatef(ball_rot[0], 1, 0, 0);
+		//glRotatef(ball_rot[1], 0, 1, 0);
+		//glRotatef(ball_rot[2], 0, 0, 1);
+
+		//glGetFloatv(GL_MODELVIEW_MATRIX, M);
+		//glGetFloatv(GL_PROJECTION_MATRIX, P);
+
+		//loc = glGetUniformLocation(program, "V");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
+		//loc = glGetUniformLocation(program, "M");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
+		//loc = glGetUniformLocation(program, "P");
+		//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
 
 
-	//glPopMatrix();
+		//loc = glGetUniformLocation(program, "eye");
+		//eye[0] = eyex;
+		//eye[1] = eyey;
+		//eye[2] = eyez;
+		//glUniform3fv(loc, 1, eye);
+
+		//loc = glGetUniformLocation(program, "time");
+		//glUniform1f(loc, time);
 
 
-	//glBindVertexArray(vaoHandle);
-	//glActiveTexture(GL_TEXTURE0);
-	//glScalef(0.3, 0.3, 0.3);
-	//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-	//glBindVertexArray(0);
+		//glPopMatrix();
 
 
-	//glUseProgram(NULL);
+		//glBindVertexArray(vaoHandle);
+		//glActiveTexture(GL_TEXTURE0);
+		//glScalef(0.3, 0.3, 0.3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+		//glBindVertexArray(0);
+
+
+		//glUseProgram(NULL);
 
 
 
-	////HW3↓
-	//glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE);
+		////HW3↓
+		//glEnable(GL_DEPTH_TEST);
+		//glEnable(GL_CULL_FACE);
 
 
-	////HW3↑
-
-	//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
-
+		//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
+	}
+	//HW3↑
+	
 	glPopMatrix();
 
 	glutSwapBuffers();
