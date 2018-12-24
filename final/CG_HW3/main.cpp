@@ -460,9 +460,16 @@ void display(void)
 	GLfloat MV[16], P[16], V[16];
 	glPushMatrix();
 	glLoadIdentity();
-	gluLookAt(eyex, eyey, eyez,
-		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), eyey + sin(eyet*M_PI / 180), eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
-		0.0, 1.0, 0.0);
+	gluLookAt(
+		eyex, 
+		eyey, 
+		eyez,
+		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), 
+		eyey + sin(eyet*M_PI / 180), 
+		eyez + cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
+		0.0, 
+		1.0, 
+		0.0);
 	glGetFloatv(GL_MODELVIEW_MATRIX, V);
 	glPopMatrix();
 
@@ -475,7 +482,7 @@ void display(void)
 		eyez,
 		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180),
 		eyey + sin(eyet*M_PI / 180),
-		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+		eyez + cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
 		0.0,
 		1.0,
 		0.0);
@@ -508,16 +515,16 @@ void display(void)
 
 	glPushMatrix();
 
+	eye[0] = eyex;
+	eye[1] = eyey;
+	eye[2] = eyez;
+
 	//no. 1
 	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
 	glScalef(1, 1, 1);
 	glTranslatef(-13, 0, 10);
 	glRotatef(3.3 + (time * 100), 0, 1, 0);
 	glScalef(2, 2, 2);
-
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
 	glGetFloatv(GL_PROJECTION_MATRIX, P);
@@ -568,10 +575,6 @@ void display(void)
 	//glRotatef(90, 0, 1, 0);
 	glRotatef(3.3 + (time * 200), 0, 1, 0);
 	glScalef(2, 2, 2);
-
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
 	glGetFloatv(GL_PROJECTION_MATRIX, P);
@@ -626,10 +629,6 @@ void display(void)
 	glTranslatef(-13, 0, -10);
 	glRotatef(3.3 + (time * 300), 0, 1, 0);
 	glScalef(2, 2, 2);
-
-	eye[0] = eyex;
-	eye[1] = eyey;
-	eye[2] = eyez;
 
 	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
 	glGetFloatv(GL_PROJECTION_MATRIX, P);
