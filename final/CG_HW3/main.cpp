@@ -59,6 +59,7 @@ GLuint programDissolve;
 GLuint programRamp;
 GLuint programBonus;
 int count = 0;
+void cameraRangeDetect();
 
 GLuint vaoHandle;
 GLuint vbo_ids[3];
@@ -150,7 +151,7 @@ GLuint renderedTexture;
 
 GLuint honeyTextureID;
 
-float eyex = 0.0;
+float eyex = -3.0;
 float eyey = 0.64;
 float eyez = 3.0;
 GLfloat eye[] = { 0, 0, 0 };
@@ -419,7 +420,7 @@ void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-	
+	glRotatef(180.0f, 0, 1, 0);
 	//you may need to do something here(declare some local variables you need and maybe load Model matrix here...)
 
 	//HW3↓
@@ -476,7 +477,7 @@ void display(void)
 		eyez,
 		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), 
 		eyey + sin(eyet*M_PI / 180), 
-		eyez + cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
+		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
 		0.0, 
 		1.0, 
 		0.0);
@@ -492,7 +493,7 @@ void display(void)
 		eyez,
 		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180),
 		eyey + sin(eyet*M_PI / 180),
-		eyez + cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
+		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
 		0.0,
 		1.0,
 		0.0);
@@ -524,6 +525,7 @@ void display(void)
 	//std::cout << ball_pos[0] << " " << ball_pos[1] << " " << ball_pos[2] << std::endl;
 
 	glPushMatrix();
+	glRotatef(180.0f, 0, 1, 0);
 
 	eye[0] = eyex;
 	eye[1] = eyey;
@@ -838,11 +840,11 @@ void display(void)
 
 	///////////////////////////////////
 	//try mirror 2
-
 	//启用深度测试，并把场景的东西都画好
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[8]);
+	glTranslatef(0, 0, -3);
 	glutSolidTeapot(1);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -857,7 +859,7 @@ void display(void)
 	glColorMask(0, 0, 0, 0);
 
 	glPushMatrix();
-	//down
+	//mirror range
 	//glBindTexture(GL_TEXTURE_2D, texture[7]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
@@ -878,7 +880,7 @@ void display(void)
 
 	//这里为画水壶的倒影
 	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, 2.0f);
+	glTranslatef(0.0f, 0.0f, 5.0f);
 	glScalef(1.0, 1.0, 1.0);
 	//glBindTexture(GL_TEXTURE_2D, texture[4]);
 	glutWireTeapot(1);
@@ -921,7 +923,23 @@ void display(void)
 
 	glutSwapBuffers();
 	camera_light_ball_move();
+
+	cameraRangeDetect();
 }
+
+void cameraRangeDetect() 
+{
+	std::cout << "(" << eyex << ", " << eyey << ", " << eyez << ")" << std::endl;
+	if (eyex <= -14) { eyex = -14; }
+	else if (eyex >= 14) { eyex = 14; }
+	if (eyey <= -9.5) { eyey = -9.5; }
+	else if (eyey >= 9.5) { eyey = 9.5; }
+	if (eyez <= -11.5) { eyez = -11.5; }
+	else if (eyez >= 11.5) { eyez = 11.5; }
+}
+
+
+
 void skybox(float a, float b)
 {
 	glTranslatef(0.0f, 0.0f, 0.0f);
@@ -980,14 +998,14 @@ void skybox(float a, float b)
 	glEnd();
 
 	//near
-	//glBindTexture(GL_TEXTURE_2D, texture[0]);
-	//glBegin(GL_TRIANGLE_STRIP);
-	//glColor3f(1, 1, 1);
-	//	glTexCoord2f(0.0f, 1.0f); glVertex3f(-a, b, -a);
-	//	glTexCoord2f(0.0f, 0.0f); glVertex3f(-a, -b, -a);
-	//	glTexCoord2f(1.0f, 1.0f); glVertex3f(a, b, -a);
-	//	glTexCoord2f(1.0f, 0.0f); glVertex3f(a, -b, -a);
-	//glEnd();
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-a, b, -a);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-a, -b, -a);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(a, b, -a);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(a, -b, -a);
+	glEnd();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
