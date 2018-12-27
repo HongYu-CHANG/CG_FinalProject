@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h> /*for function: offsetof */
 #include <math.h>
@@ -13,7 +13,7 @@
 
 
 //number of textures desired, you may want to change it to get bonus point
-#define TEXTURE_NUM 8
+#define TEXTURE_NUM 9
 //directories of image files
 char* texture_name[TEXTURE_NUM] = {
 	"../Resources/wallTexture.bmp", // 0
@@ -24,6 +24,7 @@ char* texture_name[TEXTURE_NUM] = {
 	"../Resources/pstar.bmp", // 5
 	"../Resources/wall9.bmp", // 6
 	"../Resources/wall12.bmp", // 7
+	"../Resources/teapotTexture.bmp", // 8
 
 };
 //texture id array
@@ -224,18 +225,18 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//renderFrameBuffer(³Ğ«ØFBO):https://www.itread01.com/articles/1476697216.html		
-	glGenFramebuffers(1, &depthFrameBuffer);//²£¥Í¤@­Ó§Ú­Ì¦Û¤vªº´V½w½Ä
-	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//¸j©w¦Û¤vªº´V½w½Ä
-	//texture¸j¨ìFBO¤W		
+	//renderFrameBuffer(å‰µå»ºFBO):https://www.itread01.com/articles/1476697216.html		
+	glGenFramebuffers(1, &depthFrameBuffer);//ç”¢ç”Ÿä¸€å€‹æˆ‘å€‘è‡ªå·±çš„å¹€ç·©è¡
+	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//ç¶å®šè‡ªå·±çš„å¹€ç·©è¡
+	//textureç¶åˆ°FBOä¸Š		
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, renderedTexture, 0);
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depthTextureID, 0);
-	//ÀË¬d´V½w½Ä:https://learnopengl-cn.readthedocs.io/zh/latest/04%20Advanced%20OpenGL/05%20Framebuffers/		
+	//æª¢æŸ¥å¹€ç·©è¡:https://learnopengl-cn.readthedocs.io/zh/latest/04%20Advanced%20OpenGL/05%20Framebuffers/		
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		printf("ERROR::FRAMEBUFFER:: Framebuffer is not complete!\n");
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);//¸j©w´V½w½Ä¨ì0 = ¿E¬¡"Àq»{"´V½w½Ä¡A¨S¦³³o¤@­Ó¨BÆJ¡A¦b¦Û¤vªº´V½w½Ä¸Ì­±°µªº´è¬V¾Ş§@³£·|¨S¦³¿ìªk§e²{¦bµe­±¤W:http://blog.shenyuanluo.com/LearnOpenGLNote25.html
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);//ç¶å®šå¹€ç·©è¡åˆ°0 = æ¿€æ´»"é»˜èª"å¹€ç·©è¡ï¼Œæ²’æœ‰é€™ä¸€å€‹æ­¥é©Ÿï¼Œåœ¨è‡ªå·±çš„å¹€ç·©è¡è£¡é¢åšçš„æ¸²æŸ“æ“ä½œéƒ½æœƒæ²’æœ‰è¾¦æ³•å‘ˆç¾åœ¨ç•«é¢ä¸Š:http://blog.shenyuanluo.com/LearnOpenGLNote25.html
 
-	//HW3¡ô
+	//HW3â†‘
 
 	//final project
 	//ref:http://www.opengl-tutorial.org/beginners-tutorials/tutorial-5-a-textured-cube/
@@ -247,6 +248,7 @@ void init(void)
 	Image* pstar = loadTexture(texture_name[5]);//star
 	Image* upWallTex = loadTexture(texture_name[6]);//upWall
 	Image* downWallTex = loadTexture(texture_name[7]);//downWall
+	Image* teapotTex = loadTexture(texture_name[8]);//teapot
 	
 	mainTextureID = loadTexture(main_tex_dir, 512, 256);
 	noiseTextureID = loadTexture(noise_tex_dir, 360, 360);
@@ -310,9 +312,17 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, downWallTex->sizeX, downWallTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, downWallTex->data);
 
+	glBindTexture(GL_TEXTURE_2D, texture[8]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, teapotTex->sizeX, teapotTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, teapotTex->data);
+
+/*
 	for (int i = 0; i < TEXTURE_NUM; i++) {
 		std::cout << texture[i] << std::endl;
-	}
+	}*/
 
 	//TA
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -407,15 +417,15 @@ void init(void)
 
 void display(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	
 	//you may need to do something here(declare some local variables you need and maybe load Model matrix here...)
 
-	//HW3¡õ
+	//HW3â†“
 	//renderFirst();
 	//renderSecond();
-	//HW3¡ô
+	//HW3â†‘
 
 	//final
 	glPushMatrix();
@@ -693,9 +703,9 @@ void display(void)
 	////////////////////////////////////
 
 	
-	//HW3¡õ
+	//HW3â†“
 	/*
-	//¥H¤Uif¬°ÁY±Æ¥Î
+	//ä»¥ä¸‹ifç‚ºç¸®æ’ç”¨
 	if(1){
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_2D, honeyTextureID);
@@ -811,7 +821,7 @@ void display(void)
 
 
 
-		////HW3¡õ
+		////HW3â†“
 		//glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_CULL_FACE);
 
@@ -822,8 +832,91 @@ void display(void)
 	
 	
 	*/
-	//HW3¡ô
+	//HW3â†‘
 	
+	glPopMatrix();
+
+	///////////////////////////////////
+	//try mirror 2
+
+	//å¯ç”¨æ·±åº¦æµ‹è¯•ï¼Œå¹¶æŠŠåœºæ™¯çš„ä¸œè¥¿éƒ½ç”»å¥½
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[8]);
+	glutSolidTeapot(1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//è®¾ç½®æ¨¡æ¿ï¼Œå½“ç”»é•œé¢æ—¶æŠŠé•œé¢èŒƒå›´çš„æ¨¡æ¿å€¼æ¢æˆ1&0xff
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 0xff);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+	//ç”»é•œé¢æ—¶å¿…é¡»è®¾ç½®æ·±åº¦å€¼ä¸ºåªè¯»ï¼Œå¦åˆ™ä¼šæ›´æ–°æ·±åº¦å€¼å¯¼è‡´å€’å½±ç”»ä¸ä¸Šå»
+	glDepthMask(GL_FALSE);
+	//å¦‚æœåªå¸Œæœ›ç”»åå°„èŒƒå›´å°±è¦è®¾ç½®ä¸æŠŠé•œé¢çš„å®é™…é¢œè‰²ç”»ä¸Šå»
+	glColorMask(0, 0, 0, 0);
+
+	glPushMatrix();
+	//down
+	//glBindTexture(GL_TEXTURE_2D, texture[7]);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	/*glTexCoord2f(0.0f, 1.0f);*/ glVertex3f(-3, -3, 1);
+	/*glTexCoord2f(0.0f, 0.0f);*/ glVertex3f(-3, 3, 1);
+	/*glTexCoord2f(1.0f, 1.0f);*/ glVertex3f(3, -3, 1);
+	/*glTexCoord2f(1.0f, 0.0f);*/ glVertex3f(3, 3, 1);
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glPopMatrix();
+
+	glColorMask(1, 1, 1, 1);
+	glDepthMask(GL_TRUE);
+
+	//ç»§ç»­è®¾ç½®æ¨¡æ¿æµ‹è¯•ï¼Œä¸ç­‰äºé•œé¢æ¨¡æ¿å€¼çš„åˆ™ä¸ä¼šæ˜¾ç¤º
+	glStencilFunc(GL_EQUAL, 1, 0xff);
+	glStencilFunc(GL_KEEP, GL_KEEP, GL_KEEP);
+
+	//è¿™é‡Œä¸ºç”»æ°´å£¶çš„å€’å½±
+	glPushMatrix();
+	glTranslatef(0.0f, 0.0f, 2.0f);
+	glScalef(1.0, 1.0, 1.0);
+	//glBindTexture(GL_TEXTURE_2D, texture[4]);
+	glutWireTeapot(1);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+	////////////
+	/*glBindVertexArray(vaoHandle);
+	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
+	glBindVertexArray(0);*/
+	////////////
+	glPopMatrix();
+	glDisable(GL_STENCIL_TEST);
+
+	//åŠé€æ˜é¡é¢
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glPushMatrix();
+	glBegin(GL_TRIANGLE_STRIP);
+	//glColor3f(0, 1, 0);
+	glColor4f(0.1f, 0.1f, 0.1f, 1);
+	/*glTexCoord2f(0.0f, 1.0f);*/ glVertex3f(-3, -3, 1);
+	/*glTexCoord2f(0.0f, 0.0f);*/ glVertex3f(-3, 3, 1);
+	/*glTexCoord2f(1.0f, 1.0f);*/ glVertex3f(3, -3, 1);
+	/*glTexCoord2f(1.0f, 0.0f);*/ glVertex3f(3, 3, 1);
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glPopMatrix();
+	glDisable(GL_BLEND);
+	/////////////////////////////
+	//é¡æ¡†
+	glPushMatrix();
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(0, 0.224, 0.459);
+	//glColor4f(0.1f, 0.1f, 0.1f, 1);
+	/*glTexCoord2f(0.0f, 1.0f);*/ glVertex3f(-3.3, -3.3, 1.2);
+	/*glTexCoord2f(0.0f, 0.0f);*/ glVertex3f(-3.3, 3.3, 1.2);
+	/*glTexCoord2f(1.0f, 1.0f);*/ glVertex3f(3.3, -3.3, 1.2);
+	/*glTexCoord2f(1.0f, 0.0f);*/ glVertex3f(3.3, 3.3, 1.2);
+	glEnd();
 	glPopMatrix();
 
 	glutSwapBuffers();
@@ -1009,10 +1102,10 @@ void painting()
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-3.14f, 2.5f, 14.9f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(3.14f, -2.5f, 14.9f);
 	glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);*/
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.9f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.9f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.9f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.9f);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.8f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.8f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.8f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.8f);
 	glEnd();
 
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -1023,12 +1116,12 @@ void painting()
 void renderFirst()  //Render scene except target object(s)(in this case, the barrier) to the depth texture.
 {
 	//ref:https://tiankefeng0520.iteye.com/blog/2008008
-	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//¸j©w§Ú­Ì¦Û¤v«Ø¥ßªº²`«×½w½Ä°Ï
-	//glEnable(GL_DEPTH_TEST);//¶}±Ò²`«×½w½Ä°Ï
-	//glDepthMask(GL_TRUE);//GL_TRUE¥Nªí²`«×½w½Ä°Ï¥iÅª¼g
+	glBindFramebuffer(GL_FRAMEBUFFER, depthFrameBuffer);//ç¶å®šæˆ‘å€‘è‡ªå·±å»ºç«‹çš„æ·±åº¦ç·©è¡å€
+	//glEnable(GL_DEPTH_TEST);//é–‹å•Ÿæ·±åº¦ç·©è¡å€
+	//glDepthMask(GL_TRUE);//GL_TRUEä»£è¡¨æ·±åº¦ç·©è¡å€å¯è®€å¯«
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//¶}©l¼g¤J¹Ï¹³¤º®e¨ì§Ú­Ì¦Û¤vªº½w½Ä°Ï¡A³o­Ó°Ê§@¥Nªí§Ú­Ì¥i¥H¹ï¼g¨ì½w½Ä°Ï¸Ì­±ªº©Ò¦³¤º®eª½±µ¥[¤u(¨Ï¥ÎdepthTex)¡G°Ñ·Ó http://blog.shenyuanluo.com/LearnOpenGLNote25.html ªº²Ä7ÂI
+	//é–‹å§‹å¯«å…¥åœ–åƒå…§å®¹åˆ°æˆ‘å€‘è‡ªå·±çš„ç·©è¡å€ï¼Œé€™å€‹å‹•ä½œä»£è¡¨æˆ‘å€‘å¯ä»¥å°å¯«åˆ°ç·©è¡å€è£¡é¢çš„æ‰€æœ‰å…§å®¹ç›´æ¥åŠ å·¥(ä½¿ç”¨depthTex)ï¼šåƒç…§ http://blog.shenyuanluo.com/LearnOpenGLNote25.html çš„ç¬¬7é»
 	//glPushMatrix();
 	//glScalef(0.3, 0.3, 0.3);
 	//glTranslatef(-2.1, 3.3 - fmod(time, 3), 1.3);
@@ -1058,7 +1151,7 @@ void renderFirst()  //Render scene except target object(s)(in this case, the bar
 	//glPopMatrix();
 	//glEnable(GL_CULL_FACE);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);//¨Ï²`«×½w½Ä°Ï«ì´_¬°¹w³]½w½Ä°Ï¡A¦pªGµù¸Ñ±¼¡A¿Ã¹õ·|¥ş¶Â
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);//ä½¿æ·±åº¦ç·©è¡å€æ¢å¾©ç‚ºé è¨­ç·©è¡å€ï¼Œå¦‚æœè¨»è§£æ‰ï¼Œè¢å¹•æœƒå…¨é»‘
 }
 
 
@@ -1136,11 +1229,11 @@ void renderThird(float a, float b, float c) //Render target object(s) using dept
 
 	glPopMatrix();
 
-	////Ã¸»s³z©ú¹Ï¤ù¡]¦aªO¡^¡Ghttps://blog.csdn.net/huutu/article/details/20872525
+	////ç¹ªè£½é€æ˜åœ–ç‰‡ï¼ˆåœ°æ¿ï¼‰ï¼šhttps://blog.csdn.net/huutu/article/details/20872525
 	//glDisable(GL_DEPTH_TEST);
-	//glDisable(GL_CULL_FACE);//Ãö±¼­±­ç°£(§â«D¥¿­±´Â¦Vªº­±«O¯d)
+	//glDisable(GL_CULL_FACE);//é—œæ‰é¢å‰”é™¤(æŠŠéæ­£é¢æœå‘çš„é¢ä¿ç•™)
 	//glEnable(GL_BLEND);
-	////glBlendFunc(GL_SRC_ALPHA, GL_ONE);//¤£¯à¥Î³o­Ó¡A¦aªO·|³Q³z¹L¥h(¥Ø¼Ğ¦â·|ÂĞ»\·½¦â)
+	////glBlendFunc(GL_SRC_ALPHA, GL_ONE);//ä¸èƒ½ç”¨é€™å€‹ï¼Œåœ°æ¿æœƒè¢«é€éå»(ç›®æ¨™è‰²æœƒè¦†è“‹æºè‰²)
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);//https://blog.csdn.net/alicehyxx/article/details/4263058
 
 	glBindVertexArray(vaoHandle);
