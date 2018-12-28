@@ -24,7 +24,8 @@ char* texture_name[TEXTURE_NUM] = {
 	"../Resources/pstar.bmp", // 5
 	"../Resources/wall9.bmp", // 6
 	"../Resources/wall12.bmp", // 7
-	"../Resources/teapotTexture.bmp", // 8
+	"../Resources/face24.bmp", // 8   //better: face6, face7, face24
+	//"../Resources/teapotTexture.bmp", // 8
 
 };
 //texture id array
@@ -526,6 +527,7 @@ void display(void)
 
 	glPushMatrix();
 	glRotatef(180.0f, 0, 1, 0);
+	glTranslatef(0, 0, 3);
 
 	eye[0] = eyex;
 	eye[1] = eyey;
@@ -842,10 +844,14 @@ void display(void)
 	//try mirror 2
 	//启用深度测试，并把场景的东西都画好
 	glEnable(GL_DEPTH_TEST);
+
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, texture[8]);
 	glTranslatef(0, 0, -3);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_FRONT);
 	glutSolidTeapot(1);
+	//glDisable(GL_CULL_FACE);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	//设置模板，当画镜面时把镜面范围的模板值换成1&0xff
@@ -880,17 +886,15 @@ void display(void)
 
 	//这里为画水壶的倒影
 	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, 5.0f);
-	glScalef(1.0, 1.0, 1.0);
-	//glBindTexture(GL_TEXTURE_2D, texture[4]);
-	glutWireTeapot(1);
-	//glBindTexture(GL_TEXTURE_2D, 0);
-	////////////
-	/*glBindVertexArray(vaoHandle);
-	glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-	glBindVertexArray(0);*/
-	////////////
+		glTranslatef(0.0f, 0.0f, 5.0f);
+		glScalef(1.0, 1.0, 1.0);
+		glColor3f(1, 1, 1);
+		//glColor3f(0.1, 0.15, 0.5);
+		glDisable(GL_TEXTURE_2D);
+		glutWireTeapot(1);
+		glEnable(GL_TEXTURE_2D);
 	glPopMatrix();
+	
 	glDisable(GL_STENCIL_TEST);
 
 	//半透明鏡面
@@ -914,10 +918,10 @@ void display(void)
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(0, 0.224, 0.459);
 	//glColor4f(0.1f, 0.1f, 0.1f, 1);
-	/*glTexCoord2f(0.0f, 1.0f);*/ glVertex3f(-3.3, -3.3, 1.2);
-	/*glTexCoord2f(0.0f, 0.0f);*/ glVertex3f(-3.3, 3.3, 1.2);
-	/*glTexCoord2f(1.0f, 1.0f);*/ glVertex3f(3.3, -3.3, 1.2);
-	/*glTexCoord2f(1.0f, 0.0f);*/ glVertex3f(3.3, 3.3, 1.2);
+	glVertex3f(-3.3, -3.3, 1.2);
+	glVertex3f(-3.3, 3.3, 1.2);
+	glVertex3f(3.3, -3.3, 1.2);
+	glVertex3f(3.3, 3.3, 1.2);
 	glEnd();
 	glPopMatrix();
 
