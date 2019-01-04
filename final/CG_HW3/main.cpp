@@ -13,7 +13,7 @@
 
 
 //number of textures desired, you may want to change it to get bonus point
-#define TEXTURE_NUM 9
+#define TEXTURE_NUM 13
 //directories of image files
 char* texture_name[TEXTURE_NUM] = {
 	"../Resources/wallTexture.bmp", // 0
@@ -26,7 +26,10 @@ char* texture_name[TEXTURE_NUM] = {
 	"../Resources/wall12.bmp", // 7
 	"../Resources/face24.bmp", // 8   //better: face6, face7, face24
 	//"../Resources/teapotTexture.bmp", // 8
-
+	"../Resources/pmucha_word_r.bmp", // 9
+	"../Resources/pkiss_word_r.bmp", // 10
+	"../Resources/ppiano_word_r.bmp", // 11
+	"../Resources/pstar_word_r.bmp", // 12
 };
 //texture id array
 GLuint texture[TEXTURE_NUM];
@@ -35,6 +38,7 @@ GLuint texture[TEXTURE_NUM];
 void cabinet(float a, float b);
 void skybox(float a, float b);
 void painting();
+void painting_words();
 
 extern "C"
 {
@@ -251,13 +255,17 @@ void init(void)
 	Image* upWallTex = loadTexture(texture_name[6]);//upWall
 	Image* downWallTex = loadTexture(texture_name[7]);//downWall
 	Image* teapotTex = loadTexture(texture_name[8]);//teapot
-	
+	Image* pmucha_word = loadTexture(texture_name[9]);//mucha_word
+	Image* pkiss_word = loadTexture(texture_name[10]);//kiss_word
+	Image* ppiano_word = loadTexture(texture_name[11]);//piano_word
+	Image* pstar_word = loadTexture(texture_name[12]);//star_word
+
 	mainTextureID = loadTexture(main_tex_dir, 512, 256);
 	noiseTextureID = loadTexture(noise_tex_dir, 360, 360);
 	rampTextureID = loadTexture(ramp_tex_dir, 256, 256);
 
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures(8, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
+	glGenTextures(13, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -321,7 +329,39 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, teapotTex->sizeX, teapotTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, teapotTex->data);
 
-/*
+	// words
+	glBindTexture(GL_TEXTURE_2D, texture[9]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pmucha_word->sizeX, pmucha_word->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pmucha_word->data);
+
+	glBindTexture(GL_TEXTURE_2D, texture[10]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pkiss_word->sizeX, pkiss_word->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pkiss_word->data);
+
+	glBindTexture(GL_TEXTURE_2D, texture[11]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ppiano_word->sizeX, ppiano_word->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, ppiano_word->data);
+
+	glBindTexture(GL_TEXTURE_2D, texture[12]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pstar_word->sizeX, pstar_word->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pstar_word->data);
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+	
+	/*
 	for (int i = 0; i < TEXTURE_NUM; i++) {
 		std::cout << texture[i] << std::endl;
 	}*/
@@ -440,6 +480,7 @@ void display(void)
 	cabinet(-8, -12);
 
 	painting();
+	painting_words();
 
 	glPopMatrix();
 	//glEnable(GL_CULL_FACE);
@@ -933,7 +974,7 @@ void display(void)
 
 void cameraRangeDetect() 
 {
-	std::cout << "(" << eyex << ", " << eyey << ", " << eyez << ")" << std::endl;
+	//std::cout << "(" << eyex << ", " << eyey << ", " << eyez << ")" << std::endl;
 	if (eyex <= -14) { eyex = -14; }
 	else if (eyex >= 14) { eyex = 14; }
 	if (eyey <= -9.5) { eyey = -9.5; }
@@ -1133,6 +1174,62 @@ void painting()
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void painting_words()
+{
+	//mucha word
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[9]);
+	//glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, -4.3f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, -1.5f, -4.3f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -6.7f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, -1.5f, -6.7f); //-6.9475f
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//kiss word
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[10]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 5.1f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, -1.5f, 5.1f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 2.7f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, -1.5f, 2.7f); //2.425f
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//piano word
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[11]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 13.4f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, -1.5f, 13.4f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 11.0f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, -1.5f, 11.0f); //10.6775f
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//star word
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, texture[12]);
+	glTranslatef(0.0f, 0.0f, 0.0f);
+	glBegin(GL_TRIANGLE_STRIP);
+	glColor3f(1, 1, 1);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(-8.9f, -2.5f, 14.8f);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(-8.9f, -1.5f, 14.8f);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(-6.5f, -2.5f, 14.8f);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(-6.5f, -1.5f, 14.8f); //x = 6.28f ~ -6.28f
+	glEnd();
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+}
 
 
 void renderFirst()  //Render scene except target object(s)(in this case, the barrier) to the depth texture.
