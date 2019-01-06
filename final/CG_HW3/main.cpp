@@ -76,6 +76,16 @@ GLfloat mycolor = 0;
 GLfloat frequency = 2;
 bool renderBool = true;
 
+//light1(只能關燈)
+bool lamp = false;
+float LightPos[] = { 0.0f, 0.0f, 0.0f, 1.0f };//Light position
+float LightAmb[] = { 0.5f, 0.5f, 0.5f, 1.0f };//Ambient Light Values
+float LightDif[] = { 0.0f, 0.0f, 0.0f, 1.0f };//Diffuse Light Values
+float LightSpc[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Specular Light Values
+//float LightDif[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Diffuse Light Values
+//float LightSpc[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Specular Light Values
+
+
 //no need to modify the following function declarations and gloabal variables
 void init(void);
 void display(void);
@@ -101,8 +111,10 @@ namespace
 	
 	
 	GLfloat light_rad = 0.05;//radius of the light bulb
-	float eyet = 0.0;//theta in degree
-	float eyep = 90.0;//phi in degree
+	float eyet = -5.28;//theta in degree
+	float eyep = 286.8;//phi in degree
+	//float eyet = 0.0;//theta in degree
+	//float eyep = 90.0;//phi in degree
 	bool mleft = false;
 	bool mright = false;
 	bool mmiddle = false;
@@ -156,9 +168,12 @@ GLuint renderedTexture;
 
 GLuint honeyTextureID;
 
-float eyex = -3.0;
-float eyey = 0.64;
-float eyez = 3.0;
+float eyex = -1.64;
+float eyey = 0.94;
+float eyez = -11.5;
+//float eyex = -3.0;
+//float eyey = 0.64;
+//float eyez = 3.0;
 GLfloat eye[] = { 0, 0, 0 };
 
 GLfloat light_pos[] = { 1.1, 1.0, 1.3 };
@@ -181,6 +196,7 @@ void Tick(int id)
 
 int main(int argc, char *argv[])
 {
+
 	glutInit(&argc, argv);
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
@@ -459,6 +475,19 @@ void init(void)
 
 void display(void)
 {
+	if (lamp)
+	{
+		glEnable(GL_LIGHTING);//Enable Lighting
+	}
+	else 
+	{
+		glDisable(GL_LIGHTING);//Enable Lighting
+	}
+	glEnable(GL_LIGHT1);//Enable Light1
+	glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmb);//Set Light1 Ambience
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDif);//Set Light1 Diffuse
+	glLightfv(GL_LIGHT1, GL_SPECULAR, LightSpc);//Set Light1 Specular
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	glRotatef(180.0f, 0, 1, 0);
@@ -1376,25 +1405,7 @@ void keyboard(unsigned char key, int x, int y) {
 	}
 	case 'b'://toggle mask color
 	{
-		//you may need to do somting here
-		if (mycolor == 0)
-		{
-			mycolor = 1;
-			//GLfloat Color[] = { 216, 59, 159, 4 };//pink
-			std::cout << "pink: " << mycolor << std::endl;
-		}
-		else if (mycolor == 1) 
-		{
-			mycolor = 2;
-			//GLfloat Color[] = { 16, 209, 159, 4 };//green
-			std::cout << "green: " << mycolor << std::endl;
-		}
-		else 
-		{
-			mycolor = 0;
-			//GLfloat Color[] = { 16, 59, 159, 4 };//blue
-			std::cout << "blue: " << mycolor << std::endl;
-		}
+		lamp = !lamp;
 		break;
 	}
 
