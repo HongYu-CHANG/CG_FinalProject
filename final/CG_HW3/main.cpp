@@ -7,13 +7,11 @@
 #include "../GL/glut.h"
 #include "../shader_lib/shader.h"
 #include "glm/glm.h"
-
 #include "Image.hpp"
 #include <iostream>
 
-
 //number of textures desired, you may want to change it to get bonus point
-#define TEXTURE_NUM 13
+#define TEXTURE_NUM 14
 //directories of image files
 char* texture_name[TEXTURE_NUM] = {
 	"../Resources/wallTexture.bmp", // 0
@@ -30,6 +28,7 @@ char* texture_name[TEXTURE_NUM] = {
 	"../Resources/pkiss_word_r.bmp", // 10
 	"../Resources/ppiano_word_r.bmp", // 11
 	"../Resources/pstar_word_r.bmp", // 12
+	"../Resources/door.bmp", // 13
 };
 //texture id array
 GLuint texture[TEXTURE_NUM];
@@ -45,10 +44,6 @@ extern "C"
 	#include "glm_helper.h"
 }
 
-/*you may need to do something here
-you may use the following struct type to perform your single VBO method,
-or you can define/declare multiple VBOs for VAO method.
-Please feel free to modify it*/
 struct Vertex
 {
 	GLfloat position[3];
@@ -85,7 +80,6 @@ float LightSpc[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Specular Light Values
 //float LightDif[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Diffuse Light Values
 //float LightSpc[] = { 1.0f, 1.0f, 1.0f, 1.0f };//Specular Light Values
 
-
 //no need to modify the following function declarations and gloabal variables
 void init(void);
 void display(void);
@@ -95,6 +89,7 @@ void keyboardup(unsigned char key, int x, int y);
 void motion(int x, int y);
 void mouse(int button, int state, int x, int y);
 void idle(void);
+void draw_light_bulb(void);
 void camera_light_ball_move();
 GLuint loadTexture(char* name, GLfloat width, GLfloat height);
 
@@ -146,37 +141,24 @@ namespace
 	int mousey = 0;
 }
 
-// You can modify the moving/rotating speed if it's too fast/slow for you
 const float speed = 0.03; // camera / light / ball moving speed
 const float rotation_speed = 0.05; // ball rotating speed
-
-//you may need to use some of the following variables in your program 
-
-// No need for model texture, 'cause glmModel() has already loaded it for you.
-// To use the texture, check glmModel documentation.
 
 GLuint mainTextureID; // TA has already loaded this texture for you
 GLuint noiseTextureID; // TA has already loaded this texture for you
 GLuint rampTextureID; // TA has already loaded this texture for you
-
-
 GLMmodel *model, *bunnyModel, *teapotModel; //TA has already loaded the model for you(!but you still need to convert it to VBO(s)!)
-
 GLuint depthFrameBuffer;
 GLuint depthTextureID;
 GLuint renderedTexture;
-
 GLuint honeyTextureID;
 
 float eyex = -1.64;
-float eyey = 0.94;
+float eyey = 0.8;//0.94;
 float eyez = -11.5;
-//float eyex = -3.0;
-//float eyey = 0.64;
-//float eyez = 3.0;
 GLfloat eye[] = { 0, 0, 0 };
 
-GLfloat light_pos[] = { 1.1, 1.0, 1.3 };
+GLfloat light_pos[] = { 7.16923, 0.252734, -12.9211 };//{ 1.1, 1.0, 1.3 };
 GLfloat ball_pos[] = { 0.0, 0.0, 0.0 };
 GLfloat ball_rot[] = { 0.0, 0.0, 0.0 };
 
@@ -192,8 +174,6 @@ void Tick(int id)
 	glutTimerFunc(deltaTime, Tick, 0); // 100ms for passTime step size
 }
 
-
-
 int main(int argc, char *argv[])
 {
 
@@ -205,7 +185,6 @@ int main(int argc, char *argv[])
 	glutReshapeWindow(512, 512);
 
 	glewInit();
-
 	init();
 
 	glutReshapeFunc(reshape);
@@ -217,7 +196,6 @@ int main(int argc, char *argv[])
 	glutMotionFunc(motion);
 
 	glutTimerFunc(deltaTime, Tick, 0); //pass Timer function
-
 	glutMainLoop();
 
 	glmDelete(model);
@@ -275,13 +253,14 @@ void init(void)
 	Image* pkiss_word = loadTexture(texture_name[10]);//kiss_word
 	Image* ppiano_word = loadTexture(texture_name[11]);//piano_word
 	Image* pstar_word = loadTexture(texture_name[12]);//star_word
+	Image* door = loadTexture(texture_name[13]);//door
 
 	mainTextureID = loadTexture(main_tex_dir, 512, 256);
 	noiseTextureID = loadTexture(noise_tex_dir, 360, 360);
 	rampTextureID = loadTexture(ramp_tex_dir, 256, 256);
 
 	glEnable(GL_TEXTURE_2D);
-	glGenTextures(13, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
+	glGenTextures(14, texture);//ref:https://www.youtube.com/watch?v=N9MnV7GznQ8
 	glBindTexture(GL_TEXTURE_2D, texture[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -295,7 +274,7 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, cabinetTex->sizeX, cabinetTex->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, cabinetTex->data);
-	//
+	
 	glBindTexture(GL_TEXTURE_2D, texture[2]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -374,15 +353,16 @@ void init(void)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, pstar_word->sizeX, pstar_word->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, pstar_word->data);
 
+	glBindTexture(GL_TEXTURE_2D, texture[13]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, door->sizeX, door->sizeY, 0, GL_RGB, GL_UNSIGNED_BYTE, door->data);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_TEXTURE_2D);
-	
-	/*
-	for (int i = 0; i < TEXTURE_NUM; i++) {
-		std::cout << texture[i] << std::endl;
-	}*/
 
-	//TA
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glEnable(GL_CULL_FACE);
@@ -410,8 +390,6 @@ void init(void)
 	glEnable(GL_DEPTH_TEST);
 	print_model_info(teapotModel);
 
-	//you may need to do something here(create shaders/program(s) and create vbo(s)/vao from GLMmodel model)
-	// fill data from model
 	vertices = new Vertex[3 * model->numtriangles];
 	for (int i = 0; i < model->numtriangles; ++i) {
 		for (int k = 0; k < 3; ++k) {
@@ -446,12 +424,6 @@ void init(void)
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texcoord));
 	glBindVertexArray(0);
 
-	// APIs for creating shaders and creating shader programs have been done by TAs
-	// following is an example for creating a shader program using given vertex shader and fragment shader
-	// create program
-	//GLuint vert = createShader("Shaders/barrier.vert", "vertex");
-	//GLuint frag = createShader("Shaders/barrier.frag", "fragment");
-	
 	GLuint vert = createShader("Shaders/final.vert", "vertex");
 	GLuint frag = createShader("Shaders/final.frag", "fragment");
 	program = createProgram(vert, frag);
@@ -491,71 +463,35 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	glRotatef(180.0f, 0, 1, 0);
-	//you may need to do something here(declare some local variables you need and maybe load Model matrix here...)
-
-	//HW3↓
-	//renderFirst();
-	//renderSecond();
-	//HW3↑
 
 	//final
 	glPushMatrix();
-
-
-	skybox(15, 10);
-
-	cabinet(12, 8);
-	cabinet(2, -2);
-	cabinet(-8, -12);
-
-	painting();
-	painting_words();
-
+		skybox(15, 10);
+		cabinet(12, 8);
+		cabinet(2, -2);
+		cabinet(-8, -12);
+		painting();
+		painting_words();
 	glPopMatrix();
-	//glEnable(GL_CULL_FACE);
-
-	//-----
-
-	////please try not to modify the following block of code(you can but you are not supposed to)
-	//glMatrixMode(GL_MODELVIEW);
-	//glLoadIdentity();
-	//gluLookAt(
-	//	eyex, 
-	//	eyey, 
-	//	eyez,
-	//	eyex+cos(eyet*M_PI/180)*cos(eyep*M_PI / 180), 
-	//	eyey+sin(eyet*M_PI / 180), 
-	//	eyez-cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
-	//	0.0,
-	//	1.0,
-	//	0.0);
-	//glPushMatrix();
-
-	// please try not to modify the previous block of code
-
-	// you may need to do something here(pass uniform variable(s) to shader and render the model)
-
-
-	////////////////////////////////////
 
 	GLuint loc;
 	GLfloat MV[16], P[16], V[16];
+
 	glPushMatrix();
-	glLoadIdentity();
-	gluLookAt(
-		eyex, 
-		eyey, 
-		eyez,
-		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), 
-		eyey + sin(eyet*M_PI / 180), 
-		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
-		0.0, 
-		1.0, 
-		0.0);
-	glGetFloatv(GL_MODELVIEW_MATRIX, V);
+		glLoadIdentity();
+		gluLookAt(
+			eyex, 
+			eyey, 
+			eyez,
+			eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180), 
+			eyey + sin(eyet*M_PI / 180), 
+			eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
+			0.0, 
+			1.0, 
+			0.0);
+		glGetFloatv(GL_MODELVIEW_MATRIX, V);
 	glPopMatrix();
 
-	//please try not to modify the following block of code(you can but you are not supposed to)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(
@@ -564,36 +500,11 @@ void display(void)
 		eyez,
 		eyex + cos(eyet*M_PI / 180)*cos(eyep*M_PI / 180),
 		eyey + sin(eyet*M_PI / 180),
-		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180), //eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180
+		eyez - cos(eyet*M_PI / 180)*sin(eyep*M_PI / 180),
 		0.0,
 		1.0,
 		0.0);
 	//draw_light_bulb();
-
-	//original code
-	//glPushMatrix();
-	//	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-	//	//glRotatef(ball_rot[0], 1, 0, 0);
-	//	//glRotatef(ball_rot[1], 0, 1, 0);
-	//	//glRotatef(ball_rot[2], 0, 0, 1);
-	//	
-	//// please try not to modify the previous block of code
-
-	//// you may need to do something here(pass uniform variable(s) to shader and render the model)
-	//	//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
-	//	
-	//	eye[0] = eyex;
-	//	eye[1] = eyey;
-	//	eye[2] = eyez;
-	//	
-	//	glGetFloatv(GL_MODELVIEW_MATRIX, MV);
-	//	glGetFloatv(GL_PROJECTION_MATRIX, P);
-	//original code end
-
-
-	//try more than 1 model
-
-	//std::cout << ball_pos[0] << " " << ball_pos[1] << " " << ball_pos[2] << std::endl;
 
 	glPushMatrix();
 	glRotatef(180.0f, 0, 1, 0);
@@ -604,7 +515,6 @@ void display(void)
 	eye[2] = eyez;
 
 	//no. 1
-	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] - 2);
 	glScalef(1, 1, 1);
 	glTranslatef(-13, 0, 10);
 	glRotatef(3.3 + (time * 100), 0, 1, 0);
@@ -651,7 +561,6 @@ void display(void)
 	glUseProgram(NULL);
 
 	//no. 2
-	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
 	glScalef(0.5, 0.5, 0.5);
 	glRotatef(3.3 + (time * 100), 0, -1, 0);
 	glTranslatef(13, 0, -10);
@@ -704,9 +613,8 @@ void display(void)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, NULL);
 	glUseProgram(NULL);
-	//no. 3
-	//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2] + 2);
 	
+	//no. 3
 	glScalef(0.5, 0.5, 0.5);
 	glRotatef(3.3 + (time * 200), 0, -1, 0);
 	glTranslatef(13, 0, 0);
@@ -774,140 +682,6 @@ void display(void)
 
 	glDisable(GL_TEXTURE_2D);
 
-	////////////////////////////////////
-
-	
-	//HW3↓
-	/*
-	//以下if為縮排用
-	if(1){
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, honeyTextureID);
-		//glActiveTexture(GL_TEXTURE1);
-		//glBindTexture(GL_TEXTURE_2D, depthTextureID);
-
-
-		//renderFirst();
-
-		//GLfloat V[16];
-		//glGetFloatv(GL_MODELVIEW_MATRIX, V);
-
-
-		////no.1
-		//glUseProgram(program);
-
-		//GLuint loc;
-		//GLfloat M[16], P[16];
-
-		//loc = glGetUniformLocation(program, "honeyTex");
-		//glUniform1i(loc, 0);
-		//loc = glGetUniformLocation(program, "depthTex");
-		//glUniform1i(loc, 1);
-
-		//glLoadIdentity();
-		//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]);
-		//glRotatef(ball_rot[0], 1, 0, 0);
-		//glRotatef(ball_rot[1], 0, 1, 0);
-		//glRotatef(ball_rot[2], 0, 0, 1);
-
-		//glGetFloatv(GL_MODELVIEW_MATRIX, M);
-		//glGetFloatv(GL_PROJECTION_MATRIX, P);
-
-		//loc = glGetUniformLocation(program, "V");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-		//loc = glGetUniformLocation(program, "M");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-		//loc = glGetUniformLocation(program, "P");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
-
-
-		//loc = glGetUniformLocation(program, "eye");
-		//eye[0] = eyex;
-		//eye[1] = eyey;
-		//eye[2] = eyez;
-		//glUniform3fv(loc, 1, eye);
-
-		//loc = glGetUniformLocation(program, "time");
-		//glUniform1f(loc, time);
-
-
-		//glPopMatrix();
-
-
-		//glBindVertexArray(vaoHandle);
-		//glActiveTexture(GL_TEXTURE0);
-		//glScalef(0.3, 0.3, 0.3);
-		//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-		//glBindVertexArray(0);
-
-
-		//glUseProgram(NULL);
-
-		////no.1
-		//glUseProgram(program);
-
-		//GLuint loc;
-		//GLfloat M[16], P[16];
-
-		//loc = glGetUniformLocation(program, "honeyTex");
-		//glUniform1i(loc, 0);
-		//loc = glGetUniformLocation(program, "depthTex");
-		//glUniform1i(loc, 1);
-
-		//glLoadIdentity();
-		//glTranslatef(ball_pos[0], ball_pos[1], ball_pos[2]+2);
-		//glRotatef(ball_rot[0], 1, 0, 0);
-		//glRotatef(ball_rot[1], 0, 1, 0);
-		//glRotatef(ball_rot[2], 0, 0, 1);
-
-		//glGetFloatv(GL_MODELVIEW_MATRIX, M);
-		//glGetFloatv(GL_PROJECTION_MATRIX, P);
-
-		//loc = glGetUniformLocation(program, "V");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, V);
-		//loc = glGetUniformLocation(program, "M");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, M);
-		//loc = glGetUniformLocation(program, "P");
-		//glUniformMatrix4fv(loc, 1, GL_FALSE, P);
-
-
-		//loc = glGetUniformLocation(program, "eye");
-		//eye[0] = eyex;
-		//eye[1] = eyey;
-		//eye[2] = eyez;
-		//glUniform3fv(loc, 1, eye);
-
-		//loc = glGetUniformLocation(program, "time");
-		//glUniform1f(loc, time);
-
-
-		//glPopMatrix();
-
-
-		//glBindVertexArray(vaoHandle);
-		//glActiveTexture(GL_TEXTURE0);
-		//glScalef(0.3, 0.3, 0.3);
-		//glDrawArrays(GL_TRIANGLES, 0, 3 * model->numtriangles);
-		//glBindVertexArray(0);
-
-
-		//glUseProgram(NULL);
-
-
-
-		////HW3↓
-		//glEnable(GL_DEPTH_TEST);
-		//glEnable(GL_CULL_FACE);
-
-
-		//glmDraw(model,GLM_TEXTURE);// please delete this line in your final code! It's just a preview of rendered object
-	}
-	
-	
-	
-	*/
-	//HW3↑
-	
 	glPopMatrix();
 
 	///////////////////////////////////
@@ -1012,8 +786,6 @@ void cameraRangeDetect()
 	else if (eyez >= 11.5) { eyez = 11.5; }
 }
 
-
-
 void skybox(float a, float b)
 {
 	glTranslatef(0.0f, 0.0f, 0.0f);
@@ -1072,7 +844,7 @@ void skybox(float a, float b)
 	glEnd();
 
 	//near
-	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	glBindTexture(GL_TEXTURE_2D, texture[13]);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
 		glTexCoord2f(0.0f, 1.0f); glVertex3f(-a, b, -a);
@@ -1190,10 +962,6 @@ void painting()
 	glTranslatef(0.0f, 0.0f, 0.0f);
 	glBegin(GL_TRIANGLE_STRIP);
 	glColor3f(1, 1, 1);
-	/*glTexCoord2f(0.0f, 0.0f); glVertex3f(-3.14f, -2.5f, 14.9f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-3.14f, 2.5f, 14.9f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(3.14f, -2.5f, 14.9f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(3.14f, 2.5f, 14.9f);*/
 	glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.8f);
 	glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.8f);
 	glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.8f);
@@ -1394,6 +1162,19 @@ void renderThird(float a, float b, float c) //Render target object(s) using dept
 	glUseProgram(NULL);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+}
+
+void draw_light_bulb()
+{
+	GLUquadric *quad;
+	quad = gluNewQuadric();
+	glPushMatrix();
+	//glColor3f(0.4, 0.5, 0);
+	//glColor3f(1, 1, 1);
+	glTranslatef(light_pos[0], light_pos[1], light_pos[2]);
+	gluSphere(quad, light_rad, 40, 20);
+	glColor3f(1.0, 1.0, 1.0);
+	glPopMatrix();
 }
 
 //please implement mode toggle(switch mode between phongShading/Dissolving/Ramp) in case 'b'(lowercase)

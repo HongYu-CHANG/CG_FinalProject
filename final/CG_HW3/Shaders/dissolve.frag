@@ -36,7 +36,6 @@ void main() {
 	}
     
 	outColor += vSample;
-	
 }
 
 /*

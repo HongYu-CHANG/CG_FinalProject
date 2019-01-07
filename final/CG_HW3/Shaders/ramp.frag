@@ -53,7 +53,7 @@ void main() {
 		//I.rgb = vec3(I.r*0.5f + 0.0f*0.5f, I.g*0.5f + 0.0f*0.5f, I.b*0.5f + 0.0f*0.5f);
 	}
 	
-	outColor = vec4(I, 1);
+	outColor = vec4(I, 1) + vec4(0.047, 0.533, 0.071, 0);
 }
 
 /*

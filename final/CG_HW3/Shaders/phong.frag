@@ -40,7 +40,7 @@ void main() {
 		I += specular_L.rgb * pow(dot2, Shiness);
 	}
 	
-	outColor = vec4(I, 1);
+	outColor = vec4(I, 1) + vec4(0.047, 0.086, 0.533, 0);
 }
 
 /*
