@@ -3,6 +3,7 @@
 #include <stddef.h> /*for function: offsetof */
 #include <math.h>
 #include <string.h>
+#include <string>
 #include "../GL/glew.h"
 #include "../GL/glut.h"
 #include "../shader_lib/shader.h"
@@ -61,6 +62,11 @@ GLuint programBonus;
 int count = 0;
 void cameraRangeDetect();
 
+bool Mpressed = false; //Mucha Zodiac
+bool Kpressed = false; //Kiss
+bool Rpressed = false; //Piano
+bool Vpressed = false; //Star Night
+
 GLuint vaoHandle;
 GLuint vbo_ids[3];
 Vertex *vertices;
@@ -107,7 +113,7 @@ namespace
 	
 	GLfloat light_rad = 0.05;//radius of the light bulb
 	float eyet = -5.28;//theta in degree
-	float eyep = 286.8;//phi in degree
+	float eyep = 95;//phi in degree
 	//float eyet = 0.0;//theta in degree
 	//float eyep = 90.0;//phi in degree
 	bool mleft = false;
@@ -153,9 +159,9 @@ GLuint depthTextureID;
 GLuint renderedTexture;
 GLuint honeyTextureID;
 
-float eyex = -1.64;
-float eyey = 0.8;//0.94;
-float eyez = -11.5;
+float eyex = 0.305;//-1.64;
+float eyey = 1.585;// 0.8;//0.94;
+float eyez = 11.5;// -11.5;
 GLfloat eye[] = { 0, 0, 0 };
 
 GLfloat light_pos[] = { 7.16923, 0.252734, -12.9211 };//{ 1.1, 1.0, 1.3 };
@@ -204,7 +210,6 @@ int main(int argc, char *argv[])
 
 void init(void)
 {
-	
 	//add honey texture
 	honeyTextureID = loadTexture(main_tex_dir, 512, 256);
 
@@ -443,6 +448,10 @@ void init(void)
 	GLuint vertBonus = createShader("Shaders/bonus.vert", "vertex");
 	GLuint fragBonus = createShader("Shaders/bonus.frag", "fragment");
 	programBonus = createProgram(vertBonus, fragBonus);
+
+	std::cout << "╭ 。☆ ║ 歡迎來到空中博物館 ║ ☆。╮" << std::endl << std::endl;
+	std::cout << "☆ 按 b 可以開 / 關燈" << std::endl;
+	std::cout << "☆ 請按下畫家名字的第一個字母，來打開被隱藏的畫作" << std::endl;
 }
 
 void display(void)
@@ -920,54 +929,62 @@ void cabinet(float a, float b)
 }
 void painting() 
 {
-	//mucha
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[2]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, -6.9475f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, -6.9475f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -10.6775f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -10.6775f);
-	glEnd();
-
-	//kiss
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[3]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 2.425f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 2.425f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -2.625f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -2.625f);
-	glEnd();
-
-	//piano
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[4]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 10.6775f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 10.6775f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 6.7475f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, 6.7475f);
-	glEnd();
-
-	//star
-	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, texture[5]);
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	glBegin(GL_TRIANGLE_STRIP);
-	glColor3f(1, 1, 1);
-	glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.8f);
-	glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.8f);
-	glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.8f);
-	glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.8f);
-	glEnd();
-
+	if (Mpressed) {
+		//mucha
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture[2]);
+		glTranslatef(0.0f, 0.0f, 0.0f);
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f(1, 1, 1);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, -6.9475f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, -6.9475f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -10.6775f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -10.6775f);
+		glEnd();
+	}
+	
+	if (Kpressed) {
+		//kiss
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture[3]);
+		glTranslatef(0.0f, 0.0f, 0.0f);
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f(1, 1, 1);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 2.425f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 2.425f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, -2.625f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, -2.625f);
+		glEnd();
+	}
+	
+	if (Rpressed) {
+		//piano
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture[4]);
+		glTranslatef(0.0f, 0.0f, 0.0f);
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f(1, 1, 1);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(14.9, -2.5f, 10.6775f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(14.9, 2.5f, 10.6775f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(14.9, -2.5f, 6.7475f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(14.9, 2.5f, 6.7475f);
+		glEnd();
+	}
+	
+	if (Vpressed) {
+		//star
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, texture[5]);
+		glTranslatef(0.0f, 0.0f, 0.0f);
+		glBegin(GL_TRIANGLE_STRIP);
+		glColor3f(1, 1, 1);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-6.28f, -5, 14.8f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-6.28f, 5, 14.8f);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(6.28f, -5, 14.8f);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(6.28f, 5, 14.8f);
+		glEnd();
+	}
+	
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -1190,26 +1207,6 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 	}
 
-	case 'v':
-	{
-		frequency += 4.0f;
-		if (frequency > 11)
-		{
-			frequency = 2.0f;
-		}
-		std::cout << "frequency: " << frequency << std::endl;
-
-		break;
-	}
-
-	case 'n':
-	{
-		renderBool = !renderBool;
-		std::cout << "renderSecond: " << frequency << std::endl;
-
-		break;
-	}
-
 	case 'd':
 	{
 		right = true;
@@ -1260,11 +1257,11 @@ void keyboard(unsigned char key, int x, int y) {
 		lleft = true;
 		break;
 	}
-	case 'r':
-	{
-		lup = true;
-		break;
-	}
+	//case 'r':
+	//{
+	//	lup = true;
+	//	break;
+	//}
 	case 'y':
 	{
 		ldown = true;
@@ -1275,11 +1272,11 @@ void keyboard(unsigned char key, int x, int y) {
 		bforward = true;
 		break;
 	}
-	case 'k':
-	{
-		bbackward = true;
-		break;
-	}
+	//case 'k':
+	//{
+	//	bbackward = true;
+	//	break;
+	//}
 	case 'l':
 	{
 		bright = true;
@@ -1364,6 +1361,30 @@ void keyboard(unsigned char key, int x, int y) {
 		eyep = 90;
 		break;
 	}
+	
+	// painting control
+	case 'm':
+	{
+		Mpressed = true;
+		break;
+	}
+	case 'k':
+	{
+		Kpressed = true;
+		break;
+	}
+	case 'r':
+	{
+		Rpressed = true;
+		break;
+	}
+	case 'v':
+	{
+		Vpressed = true;
+		break;
+	}
+
+
 	default:
 	{
 		break;
@@ -1574,11 +1595,11 @@ void keyboardup(unsigned char key, int x, int y)
 		lleft = false;
 		break;
 	}
-	case 'r':
-	{
-		lup = false;
-		break;
-	}
+	//case 'r':
+	//{
+	//	lup = false;
+	//	break;
+	//}
 	case 'y':
 	{
 		ldown = false;
@@ -1589,11 +1610,11 @@ void keyboardup(unsigned char key, int x, int y)
 		bforward = false;
 		break;
 	}
-	case 'k':
-	{
-		bbackward = false;
-		break;
-	}
+	//case 'k':
+	//{
+	//	bbackward = false;
+	//	break;
+	//}
 	case 'l':
 	{
 		bright = false;
